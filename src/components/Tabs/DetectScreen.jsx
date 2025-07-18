@@ -36,7 +36,7 @@ function DetectScreen() {
     <>
       <div style={styles.container}>
         <header style={styles.header}>
-          <h1 style={{...styles.title, color: '#7e22ce'}}>🔍 Detect</h1>
+          <h1 style={{...styles.title, color: '#7e22ce'}}>Detect</h1>
         </header>
         <p style={styles.subtext}>AI tools to uncover and analyze image-based threats.</p>
 

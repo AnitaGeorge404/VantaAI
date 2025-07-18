@@ -69,23 +69,21 @@ function Dashboard() {
     },
   ];
 
-  // --- UPDATED BLUE & PINK COLOR SCHEMES ---
   const cardSchemes = [
-    { // Scheme 0: Soft Blue
-      bgColor: '#EFF6FF', // Tailwind blue-50
-      iconColor: '#3B82F6', // Tailwind blue-500
-      titleColor: '#1E3A8A', // Tailwind blue-900
+    { 
+      bgColor: '#EFF6FF', 
+      iconColor: '#3B82F6',
+      titleColor: '#1E3A8A',
     },
-    { // Scheme 1: Soft Pink
-      bgColor: '#FEF2F2', // Tailwind red-50 (looks pink)
-      iconColor: '#F43F5E', // Tailwind rose-500
-      titleColor: '#881337', // Tailwind rose-900
+    { 
+      bgColor: '#FEF2F2', 
+      iconColor: '#F43F5E',
+      titleColor: '#881337',
     }
   ];
 
   return (
     <div style={styles.container}>
-      {/* Header */}
       <header style={styles.header}>
         <h1 style={styles.title}>Vanta AI</h1>
         <div style={styles.profileChip}>
@@ -94,16 +92,13 @@ function Dashboard() {
         </div>
       </header>
 
-      {/* Grid of Cards */}
       <main style={styles.grid}>
         {cardData.map((card, index) => {
           const IconComponent = card.icon;
-          // Alternates between blue and pink schemes
           const scheme = cardSchemes[index % 2];
           return (
             <Link key={index} to={card.path} style={{
               ...styles.card,
-              // Subtle gradient for depth, using the chosen background color
               background: `linear-gradient(145deg, rgba(255,255,255,0.9), ${scheme.bgColor})`,
             }}>
               <div style={{...styles.iconContainer, color: scheme.iconColor }}>
@@ -120,14 +115,12 @@ function Dashboard() {
   );
 }
 
-// In Dashboard.js, UPDATE ONLY THE STYLES OBJECT AT THE BOTTOM
 
 const styles = {
   container: {
     height: '100vh',
     maxHeight: '100dvh',
     overflow: 'hidden', 
-    // Remove bottom padding from the main container
     padding: '16px 16px 0 16px',
     background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)', 
     fontFamily: "'Inter', sans-serif",
@@ -168,15 +161,12 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '16px', 
-    overflowY: 'auto', // Grid is scrollable
+    overflowY: 'auto', 
     minHeight: 0,
-    // Add generous bottom padding TO THE GRID.
-    // This ensures the last row of cards isn't hidden by the fixed navbar.
     paddingBottom: '120px', 
-    // Hide scrollbar for a cleaner look
     msOverflowStyle: 'none',
     scrollbarWidth: 'none',
-    '::-webkit-scrollbar': { // For Webkit browsers
+    '::-webkit-scrollbar': { 
         display: 'none',
     }
   },

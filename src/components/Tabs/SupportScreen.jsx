@@ -1,20 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import BottomNav from './BottomNav';
-import { MessageSquareText, BrainCircuit } from 'lucide-react'; // Modernized icons
+import { MessageSquareText, BrainCircuit } from 'lucide-react'; 
 
 function SupportScreen() {
   const cardData = [
     {
       title: 'Chatbot',
       description: 'Chat confidentially with a certified mental health professional.',
-      icon: MessageSquareText, // Changed icon
+      icon: MessageSquareText, 
       path: '/emotionalsupport',
     },
     {
       title: 'Mental Health',
       description: 'Explore articles and tools to support your mental health.',
-      icon: BrainCircuit, // Changed icon
+      icon: BrainCircuit, 
       path: '/mentalhealth',
     },
   ];

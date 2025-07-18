@@ -36,7 +36,7 @@ function PreventScreen() {
     <>
       <div style={styles.container}>
         <header style={styles.header}>
-          <h1 style={{...styles.title, color: '#DC2626'}}>🛡️ Prevention</h1>
+          <h1 style={{...styles.title, color: '#DC2626'}}>Prevent</h1>
         </header>
         <p style={styles.subtext}>Stay ahead. Use tools to prevent misuse before it begins.</p>
 
