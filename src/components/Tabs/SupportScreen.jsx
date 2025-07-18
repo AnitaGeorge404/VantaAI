@@ -1,34 +1,63 @@
-// src/components/SupportScreen.js
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import BottomNav from './BottomNav'; 
-import { Heart, MessageSquare } from 'lucide-react';
+import BottomNav from './BottomNav';
+import { MessageSquareText, BrainCircuit } from 'lucide-react'; // Modernized icons
 
 function SupportScreen() {
+  const cardData = [
+    {
+      title: 'Chatbot',
+      description: 'Chat confidentially with a certified mental health professional.',
+      icon: MessageSquareText, // Changed icon
+      path: '/emotionalsupport',
+    },
+    {
+      title: 'Mental Health',
+      description: 'Explore articles and tools to support your mental health.',
+      icon: BrainCircuit, // Changed icon
+      path: '/mentalhealth',
+    },
+  ];
+
+  const cardSchemes = [
+    {
+      bgColor: '#EFF6FF',
+      iconColor: '#3B82F6',
+      titleColor: '#1E3A8A',
+    },
+    {
+      bgColor: '#FEF2F2',
+      iconColor: '#F43F5E',
+      titleColor: '#881337',
+    }
+  ];
+
   return (
     <>
       <div style={styles.container}>
-        <h2 style={styles.heading}>💖 Emotional Support</h2>
+        <header style={styles.header}>
+          <h1 style={{...styles.title, color: '#D81B60'}}>Emotional Support</h1>
+        </header>
         <p style={styles.subtext}>Your well-being matters. Help is always available.</p>
 
-        <div style={styles.grid}>
-          <Link to="/emotionalsupport" style={{ ...styles.card, backgroundColor: '#fff3e0' }}>
-            <div style={styles.cardIcon}>
-              <MessageSquare size={24} color="#ef6c00" />
-            </div>
-            <h3 style={styles.cardTitle}>Chatbot</h3>
-            <p style={styles.cardText}>Chat confidentially with a certified mental health professional.</p>
-          </Link>
-
-          <Link to="/mentalhealth" style={{ ...styles.card, backgroundColor: '#fce4ec' }}>
-            <div style={styles.cardIcon}>
-              <Heart size={24} color="#d81b60" />
-            </div>
-            <h3 style={styles.cardTitle}>Mental Health</h3>
-            <p style={styles.cardText}>Explore articles and tools to support your mental health.</p>
-          </Link>
-        </div>
+        <main style={styles.grid}>
+          {cardData.map((card, index) => {
+            const IconComponent = card.icon;
+            const scheme = cardSchemes[index % 2];
+            return (
+              <Link key={index} to={card.path} style={{
+                ...styles.card,
+                background: `linear-gradient(145deg, rgba(255,255,255,0.9), ${scheme.bgColor})`,
+              }}>
+                <div style={{...styles.iconContainer, color: scheme.iconColor }}>
+                  <IconComponent size={20} />
+                </div>
+                <h3 style={{...styles.cardTitle, color: scheme.titleColor}}>{card.title}</h3>
+                <p style={styles.cardText}>{card.description}</p>
+              </Link>
+            );
+          })}
+        </main>
       </div>
       <BottomNav />
     </>
@@ -38,52 +67,75 @@ function SupportScreen() {
 const styles = {
   container: {
     minHeight: '100vh',
-    padding: '20px',
-    paddingBottom: '80px',
-    background: 'linear-gradient(to bottom, #fce8ff, #e0f7fa)',
-    fontFamily: 'Segoe UI, sans-serif',
+    maxHeight: '100dvh',
+    overflow: 'hidden',
+    padding: '16px',
+    paddingBottom: '0',
+    background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
+    fontFamily: "'Inter', sans-serif",
+    display: 'flex',
+    flexDirection: 'column',
   },
-  heading: {
+  header: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingBottom: '10px',
+    flexShrink: 0,
+  },
+  title: {
     fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#d81b60',
-    marginBottom: '6px'
+    fontWeight: '700',
+    fontFamily: "'Lora', serif",
+    marginBottom: '6px',
   },
   subtext: {
     fontSize: '14px',
     color: '#555',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    fontFamily: "'Inter', sans-serif",
+    flexShrink: 0,
   },
   grid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr',
+    display: 'flex',
+    flexWrap: 'wrap',
     gap: '16px',
+    justifyContent: 'space-between',
   },
   card: {
-    padding: '20px',
+    flex: '1 1 calc(50% - 10px)',
+    padding: '16px',
     borderRadius: '16px',
     textDecoration: 'none',
     color: 'inherit',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    justifyContent: 'center',
   },
-  cardIcon: {
-    width: 'fit-content',
+  iconContainer: {
+    width: '40px',
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '12px',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: '12px'
   },
   cardTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#880e4f',
-    margin: 0,
+    fontSize: '16px',
+    fontWeight: 'bold',
+    fontFamily: "'Lora', serif",
+    margin: '0 0 4px 0',
   },
   cardText: {
-    fontSize: '14px',
-    color: '#4e342e',
-    lineHeight: 1.4,
+    fontSize: '13px',
+    color: '#333',
+    lineHeight: '1.4',
     margin: 0,
-  }
+    fontFamily: "'Inter', sans-serif",
+  },
 };
 
 export default SupportScreen;
