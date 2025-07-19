@@ -55,77 +55,80 @@ const DeepfakeDetector = () => {
   };
 
   return (
-    <div style={{
-      fontFamily: "sans-serif",
-      maxWidth: "500px",
-      margin: "auto",
-      background: 'linear gradient(to bottom, #fce8ff, #e0f7fa)',
-      padding: "2rem",      
-      borderRadius: "1rem",
-      minHeight: "100vh"
-    }}>
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h1 style={{ fontSize: "1.5rem", color: "#6B21A8", marginBottom: "0.25rem" }}>Deepfake Detector</h1>
-        <p style={{ fontSize: "0.875rem", color: "#4B5563" }}>
-          Upload an image to classify whether it's real or fake using a deepfake detection model.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200 dark:bg-gradient-to-b dark:from-blue-200 dark:via-purple-200 dark:to-pink-200 flex items-center justify-center">
+      <div style={{
+        fontFamily: "sans-serif",
+        maxWidth: "500px",
+        margin: "auto",
+        
+        padding: "2rem",
+        borderRadius: "1rem",
+        minHeight: "100vh"
+      }}>
+        <div style={{ marginBottom: "1.5rem" }}>
+          <h1 style={{ fontSize: "1.5rem", color: "#6B21A8", marginBottom: "0.25rem" }}>Deepfake Detector</h1>
+          <p style={{ fontSize: "0.875rem", color: "#4B5563" }}>
+            Upload an image to classify whether it's real or fake using a deepfake detection model.
+          </p>
+        </div>
 
-      <ImageUpload onImageUpload={handleImageUpload} imagePreview={imagePreview} />
+        <ImageUpload onImageUpload={handleImageUpload} imagePreview={imagePreview} />
 
-      <div style={{ display: "flex", gap: "1rem", marginTop: "1rem", justifyContent: "center" }}>
-        <button
-          onClick={clearImage}
-          disabled={!uploadedImage}
-          style={{
-            padding: "0.5rem 1rem",
-            borderRadius: "0.5rem",
-            backgroundColor: "#FECACA",
-            color: "#991B1B",
-            border: "none",
-            cursor: "pointer",
-            fontWeight: "500"
-          }}
-        >
-          Clear
-        </button>
-        <button
-          onClick={analyzeImage}
-          disabled={!uploadedImage || isAnalyzing}
-          style={{
-            padding: "0.5rem 1rem",
-            borderRadius: "0.5rem",
-            backgroundColor: "#BFDBFE",
-            color: "#1D4ED8",
-            border: "none",
-            cursor: "pointer",
-            fontWeight: "500"
-          }}
-        >
-          {isAnalyzing ? "Analyzing..." : "Analyze Image"}
-        </button>
-      </div>
-
-      <ResultsDisplay result={result} isAnalyzing={isAnalyzing} />
-
-      {result && (
-        <div style={{ marginTop: "1rem", textAlign: "center" }}>
+        <div style={{ display: "flex", gap: "1rem", marginTop: "1rem", justifyContent: "center" }}>
           <button
-            onClick={flagForReview}
+            onClick={clearImage}
+            disabled={!uploadedImage}
             style={{
-              backgroundColor: "#E0F2FE",
-              padding: "0.75rem 1.25rem",
-              borderRadius: "0.75rem",
-              fontWeight: "500",
+              padding: "0.5rem 1rem",
+              borderRadius: "0.5rem",
+              backgroundColor: "#FECACA",
+              color: "#991B1B",
               border: "none",
-              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-              cursor: "pointer"
+              cursor: "pointer",
+              fontWeight: "500"
             }}
           >
-            🚩 Flag for Review
+            Clear
+          </button>
+          <button
+            onClick={analyzeImage}
+            disabled={!uploadedImage || isAnalyzing}
+            style={{
+              padding: "0.5rem 1rem",
+              borderRadius: "0.5rem",
+              backgroundColor: "#BFDBFE",
+              color: "#1D4ED8",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "500"
+            }}
+          >
+            {isAnalyzing ? "Analyzing..." : "Analyze Image"}
           </button>
         </div>
-      )}
+
+        <ResultsDisplay result={result} isAnalyzing={isAnalyzing} />
+
+        {result && (
+          <div style={{ marginTop: "1rem", textAlign: "center" }}>
+            <button
+              onClick={flagForReview}
+              style={{
+                backgroundColor: "#2563EB",
+                color: "white",
+                padding: "0.75rem 1.25rem",
+                borderRadius: "0.75rem",
+                fontWeight: "500",
+                border: "none",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                cursor: "pointer"
+              }}
+            >
+              🚩 Flag for Review
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
