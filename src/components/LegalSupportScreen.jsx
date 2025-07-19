@@ -1,34 +1,64 @@
-// src/components/LegalSupportScreen.js
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Scale, Bot } from 'lucide-react';
+import { Gavel, Lightbulb } from 'lucide-react'; 
 import BottomNav from './Tabs/BottomNav';
 
 function LegalSupportScreen() {
+  const cardData = [
+    {
+      title: 'Legal Chatbot and FIR Generator',
+      description: 'Ask legal questions in a safe, anonymous chat and generate FIRs.',
+      icon: Gavel, 
+      path: '/LegalChatInterface',
+    },
+    {
+      title: 'Know Your Rights Hub',
+      description: 'Browse your legal protections in simple language.',
+      icon: Lightbulb, 
+      path: '/KnowYourRightsHub',
+    },
+  ];
+
+  const cardSchemes = [
+    {
+      bgColor: '#EFF6FF',
+      iconColor: '#3B82F6',
+      titleColor: '#1E3A8A',
+    },
+    {
+      bgColor: '#FEF2F2',
+      iconColor: '#F43F5E',
+      titleColor: '#881337',
+    }
+  ];
+
   return (
     <>
       <div style={styles.container}>
-        <h2 style={styles.heading}>⚖️ Legal Support</h2>
+        <header style={styles.header}>
+          <h1 style={{...styles.title, color: '#3949ab'}}>⚖️ Legal Support</h1>
+        </header>
         <p style={styles.subtext}>Access legal resources and expert guidance.</p>
 
-        <div style={styles.grid}>
-          <Link to="/LegalChatInterface" style={{ ...styles.card, backgroundColor: '#eef2f9' }}>
-            <div style={styles.cardIcon}>
-              <Bot size={24} color="#303f9f" />
-            </div>
-            <h3 style={styles.cardTitle}>Legal Chatbot and FIR Generator</h3>
-            <p style={styles.cardText}>Ask legal questions in a safe, anonymous chat and generate FIRs.</p>
-          </Link>
-
-          <Link to="/KnowYourRightsHub" style={{ ...styles.card, backgroundColor: '#f3e5f5' }}>
-            <div style={styles.cardIcon}>
-              <Scale size={24} color="#6a1b9a" />
-            </div>
-            <h3 style={styles.cardTitle}>Know Your Rights Hub</h3>
-            <p style={styles.cardText}>Browse your legal protections in simple language.</p>
-          </Link>
-        </div>
+        <main style={styles.grid}>
+          {cardData.map((card, index) => {
+            const IconComponent = card.icon;
+            const scheme = cardSchemes[index % 2];
+            return (
+              <Link key={index} to={card.path} style={{
+                ...styles.card,
+                background: `linear-gradient(145deg, rgba(255,255,255,0.9), ${scheme.bgColor})`,
+              }}>
+                <div style={{...styles.iconContainer, color: scheme.iconColor }}>
+                  <IconComponent size={20} />
+                </div>
+                <h3 style={{...styles.cardTitle, color: scheme.titleColor}}>{card.title}</h3>
+                <p style={styles.cardText}>{card.description}</p>
+              </Link>
+            );
+          })}
+        </main>
       </div>
       <BottomNav/>
     </>
@@ -38,50 +68,75 @@ function LegalSupportScreen() {
 const styles = {
   container: {
     minHeight: '100vh',
-    padding: '20px',
-    paddingBottom: '80px',
-    background: 'linear-gradient(to bottom, #e3f2fd, #f1f8e9)',
-    fontFamily: 'Segoe UI, sans-serif',
+    maxHeight: '100dvh',
+    overflow: 'hidden',
+    padding: '16px',
+    paddingBottom: '0',
+    background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
+    fontFamily: "'Inter', sans-serif",
+    display: 'flex',
+    flexDirection: 'column',
   },
-  heading: {
+  header: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingBottom: '10px',
+    flexShrink: 0,
+  },
+  title: {
     fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#3949ab',
-    marginBottom: '6px'
+    fontWeight: '700',
+    fontFamily: "'Lora', serif",
+    marginBottom: '6px',
   },
   subtext: {
     fontSize: '14px',
     color: '#555',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    fontFamily: "'Inter', sans-serif",
+    flexShrink: 0,
   },
   grid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr',
+    display: 'flex',
+    flexWrap: 'wrap',
     gap: '16px',
+    justifyContent: 'space-between',
   },
   card: {
-    padding: '20px',
+    flex: '1 1 calc(50% - 10px)',
+    padding: '16px',
     borderRadius: '16px',
     textDecoration: 'none',
     color: 'inherit',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    justifyContent: 'center',
   },
-  cardIcon: {
-    width: 'fit-content',
+  iconContainer: {
+    width: '40px',
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '12px',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: '12px'
   },
   cardTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
-    margin: 0,
+    fontSize: '16px',
+    fontWeight: 'bold',
+    fontFamily: "'Lora', serif",
+    margin: '0 0 4px 0',
   },
   cardText: {
-    fontSize: '14px',
-    lineHeight: 1.4,
+    fontSize: '13px',
+    color: '#333',
+    lineHeight: '1.4',
     margin: 0,
-  }
+    fontFamily: "'Inter', sans-serif",
+  },
 };
 
 export default LegalSupportScreen;
