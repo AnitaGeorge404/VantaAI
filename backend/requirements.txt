@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pillow
+imagehash
+requests
+torch
+transformers
+python-multipart
