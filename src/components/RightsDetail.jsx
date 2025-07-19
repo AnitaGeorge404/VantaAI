@@ -7,10 +7,8 @@ function RightsDetail() {
   const { section } = useParams();
   const navigate = useNavigate();
   
-  // State to manage which accordion category is open. Defaults to the first one.
   const [openCategory, setOpenCategory] = useState(lawsAndRights.categories[0]?.sectionTitle);
 
-  // This crucial logic remains unchanged
   useEffect(() => {
     if (section !== "laws-&-rights") {
       navigate("/rights", { replace: true });
@@ -18,7 +16,6 @@ function RightsDetail() {
   }, [section, navigate]);
 
   const handleToggle = (categoryTitle) => {
-    // If the clicked category is already open, close it. Otherwise, open it.
     setOpenCategory(prevOpen => prevOpen === categoryTitle ? null : categoryTitle);
   };
 
@@ -27,7 +24,6 @@ function RightsDetail() {
   return (
     <div style={styles.container}>
       <div style={styles.contentWrapper}>
-        {/* Header Section */}
         <div style={styles.header}>
           <h1 style={styles.mainTitle}>{lawsAndRights.title}</h1>
           <button onClick={() => navigate(-1)} style={styles.backButton}>
@@ -35,10 +31,8 @@ function RightsDetail() {
           </button>
         </div>
 
-        {/* Description */}
         <p style={styles.introText}>{lawsAndRights.description}</p>
 
-        {/* Accordion Layout */}
         <div style={styles.accordion}>
           {lawsAndRights.categories.map((category) => {
             const isOpen = openCategory === category.sectionTitle;
@@ -55,7 +49,7 @@ function RightsDetail() {
                     style={{...styles.accordionIcon, transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'}} 
                   />
                 </button>
-                <div style={{...styles.accordionPanel, maxHeight: isOpen ? '1000px' : '0px'}}>
+                <div style={{...styles.accordionPanel, maxHeight: isOpen ? '1500px' : '0px'}}> {/* Increased max-height for longer content */}
                   <div style={styles.accordionContent}>
                     {category.laws.map((law, lawIdx) => (
                       <div key={lawIdx} style={styles.lawItem}>
@@ -82,11 +76,11 @@ function RightsDetail() {
   );
 }
 
-// A new, cleaner, and more spacious style object
 const styles = {
     container: {
         minHeight: '100vh',
-        background: 'linear-gradient(180deg, #F3F8FF 0%, #EAE4FF 100%)', // Made background even lighter
+        // Reverted to the original background as requested
+        background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)', 
         fontFamily: "'Inter', sans-serif",
         padding: '32px 16px',
     },
@@ -104,7 +98,7 @@ const styles = {
         fontSize: 'clamp(32px, 5vw, 40px)',
         fontWeight: '700',
         fontFamily: "'Lora', serif",
-        color: '#4C1D95', // A deeper, more professional purple
+        color: '#4C1D95',
         margin: 0,
     },
     backButton: {
@@ -121,7 +115,7 @@ const styles = {
     introText: {
         fontSize: 'clamp(16px, 2vw, 18px)',
         lineHeight: '1.7',
-        color: '#475569', // A softer, dark gray
+        color: '#475569',
         marginBottom: '3rem',
         maxWidth: '720px',
     },
@@ -160,7 +154,7 @@ const styles = {
         flexShrink: 0,
     },
     accordionPanel: {
-        maxHeight: '0', // Collapsed by default
+        maxHeight: '0',
         overflow: 'hidden',
         transition: 'max-height 0.4s ease-out',
     },

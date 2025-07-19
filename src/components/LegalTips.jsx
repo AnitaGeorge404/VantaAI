@@ -1,32 +1,24 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import legalTips from "../data/legalTips";
-import { ShieldCheck } from 'lucide-react'; // Icon for legal protection
-
-// Alternating color schemes for the cards
-const cardSchemes = [
-  {
-    bgColor: '#EFF6FF', // Light Blue
-    borderColor: '#3B82F6',
-    iconColor: '#1E3A8A',
-  },
-  {
-    bgColor: '#F1F5F9', // Light Gray
-    borderColor: '#64748B',
-    iconColor: '#475569',
-  },
-];
+import { ShieldCheck, ChevronDown } from 'lucide-react'; // Using icons consistent with the new design
 
 function LegalTips() {
   const navigate = useNavigate();
-  const [hoveredCard, setHoveredCard] = useState(null);
+  // State to manage which accordion category is open. Defaults to the first one.
+  const [openCategory, setOpenCategory] = useState(legalTips.categories[0]?.category);
+
+  const handleToggle = (categoryTitle) => {
+    // If the clicked category is already open, close it. Otherwise, open it.
+    setOpenCategory(prevOpen => prevOpen === categoryTitle ? null : categoryTitle);
+  };
 
   return (
     <div style={styles.container}>
       <div style={styles.contentWrapper}>
         {/* Header Section */}
         <div style={styles.header}>
-          <h2 style={styles.mainTitle}>{legalTips.title}</h2>
+          <h1 style={styles.mainTitle}>{legalTips.title}</h1>
           <button onClick={() => navigate(-1)} style={styles.backButton}>
             ← Back
           </button>
@@ -35,50 +27,49 @@ function LegalTips() {
         {/* Description */}
         <p style={styles.introText}>{legalTips.description}</p>
 
-        {/* Categories and Tips */}
-        {legalTips.categories.map((cat) => (
-          <div key={cat.category} style={styles.categorySection}>
-            <h3 style={styles.categoryTitle}>{cat.category}</h3>
-            <div style={styles.tipsList}>
-              {cat.tips.map((tip, idx) => {
-                const scheme = cardSchemes[idx % cardSchemes.length];
-                const isHovered = hoveredCard === `${cat.category}-${idx}`;
-
-                return (
-                  <div
-                    key={idx}
-                    style={{
-                      ...styles.tipCard,
-                      background: `linear-gradient(135deg, rgba(255,255,255,0.9), ${scheme.bgColor})`,
-                      borderLeft: `5px solid ${scheme.borderColor}`,
-                      transform: isHovered ? 'translateY(-3px)' : 'translateY(0)',
-                      boxShadow: isHovered ? '0 8px 20px rgba(109, 40, 217, 0.08)' : '0 2px 10px rgba(109, 40, 217, 0.05)',
-                    }}
-                    onMouseEnter={() => setHoveredCard(`${cat.category}-${idx}`)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                  >
-                    <ShieldCheck 
-                      size={24} 
-                      style={{ ...styles.tipIcon, color: scheme.iconColor }}
-                    />
-                    <p style={styles.tipText}>{tip}</p>
+        {/* Accordion Layout */}
+        <div style={styles.accordion}>
+          {legalTips.categories.map((cat) => {
+            const isOpen = openCategory === cat.category;
+            return (
+              <div key={cat.category} style={styles.accordionItem}>
+                <button 
+                  style={styles.accordionHeader} 
+                  onClick={() => handleToggle(cat.category)}
+                  aria-expanded={isOpen}
+                >
+                  <h2 style={styles.accordionTitle}>{cat.category}</h2>
+                  <ChevronDown 
+                    size={24} 
+                    style={{...styles.accordionIcon, transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'}} 
+                  />
+                </button>
+                <div style={{...styles.accordionPanel, maxHeight: isOpen ? '1500px' : '0px'}}>
+                  <div style={styles.accordionContent}>
+                    {cat.tips.map((tip, idx) => (
+                      <div key={idx} style={styles.tipItem}>
+                        <ShieldCheck size={20} style={styles.tipIcon} />
+                        <p style={styles.tipText}>{tip}</p>
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 }
 
+// Styles adapted from the clean 'RightsDetail' component design
 const styles = {
     container: {
         minHeight: '100vh',
-        background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
+        background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)', 
         fontFamily: "'Inter', sans-serif",
-        padding: '24px 16px',
+        padding: '32px 16px',
     },
     contentWrapper: {
         maxWidth: '800px',
@@ -91,59 +82,92 @@ const styles = {
         marginBottom: '1rem',
     },
     mainTitle: {
-        fontSize: 'clamp(28px, 5vw, 36px)',
+        fontSize: 'clamp(32px, 5vw, 40px)',
         fontWeight: '700',
         fontFamily: "'Lora', serif",
-        color: '#6D28D9',
+        color: '#4C1D95', // The requested dark purple
         margin: 0,
     },
     backButton: {
         padding: '8px 16px',
         fontSize: '14px',
-        background: 'rgba(255, 255, 255, 0.6)',
+        background: 'transparent',
         color: '#6D28D9',
-        border: '1px solid rgba(255, 255, 255, 0.8)',
+        border: '1px solid rgba(109, 40, 217, 0.3)',
         borderRadius: '10px',
         cursor: 'pointer',
         fontWeight: '500',
-        transition: 'background-color 0.2s ease',
+        transition: 'all 0.2s ease',
     },
     introText: {
-        fontSize: 'clamp(15px, 2vw, 17px)',
-        lineHeight: '1.6',
-        color: '#4A5568',
-        marginBottom: '2.5rem',
+        fontSize: 'clamp(16px, 2vw, 18px)',
+        lineHeight: '1.7',
+        color: '#475569',
+        marginBottom: '3rem',
+        maxWidth: '720px',
     },
-    categorySection: {
-        marginBottom: '2.5rem',
-    },
-    categoryTitle: {
-        fontSize: 'clamp(18px, 3vw, 22px)',
-        color: '#6D28D9',
-        fontWeight: '600',
-        marginBottom: '1rem',
-        paddingBottom: '8px',
-        borderBottom: '2px solid rgba(109, 40, 217, 0.2)',
-    },
-    tipsList: {
-        display: 'grid',
-        gap: '12px',
-    },
-    tipCard: {
+    accordion: {
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: 'column',
         gap: '16px',
-        padding: '16px',
-        borderRadius: '12px',
-        transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+    },
+    accordionItem: {
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '16px',
+        border: '1px solid rgba(109, 40, 217, 0.1)',
+        boxShadow: '0 4px 15px rgba(109, 40, 217, 0.05)',
+        overflow: 'hidden',
+    },
+    accordionHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        padding: '20px',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        textAlign: 'left',
+    },
+    accordionTitle: {
+        fontSize: 'clamp(18px, 3vw, 20px)',
+        color: '#4C1D95',
+        fontWeight: '600',
+        margin: 0,
+    },
+    accordionIcon: {
+        color: '#6D28D9',
+        transition: 'transform 0.3s ease',
+        flexShrink: 0,
+    },
+    accordionPanel: {
+        maxHeight: '0',
+        overflow: 'hidden',
+        transition: 'max-height 0.4s ease-out',
+    },
+    accordionContent: {
+        padding: '0 20px 20px 20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+    },
+    tipItem: {
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '12px',
+        padding: '12px',
+        background: 'rgba(245, 243, 255, 0.5)',
+        borderRadius: '10px'
     },
     tipIcon: {
         flexShrink: 0,
+        color: '#6D28D9',
+        marginTop: '3px',
     },
     tipText: {
         margin: 0,
         fontSize: '15px',
-        lineHeight: '1.6',
+        lineHeight: '1.7',
         color: '#334155',
     }
 };
