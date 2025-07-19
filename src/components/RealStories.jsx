@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import realStories from "../data/realStories";
-import { MapPin, Calendar, BookOpen } from 'lucide-react'; // Modern icons
+import { MapPin, Calendar } from 'lucide-react';
 
 // This function remains unchanged
 function groupStoriesByTag(stories) {
@@ -15,31 +15,16 @@ function groupStoriesByTag(stories) {
   return grouped;
 }
 
-// Alternating color schemes for the cards
-const cardSchemes = [
-  {
-    bgColor: '#FEF2F2', // Light Pink/Red
-    titleColor: '#881337', // Dark Red
-    metadataColor: '#F43F5E', // Medium Red
-  },
-  {
-    bgColor: '#EFF6FF', // Light Blue
-    titleColor: '#1E3A8A', // Dark Blue
-    metadataColor: '#3B82F6', // Medium Blue
-  },
-];
-
 function RealStories() {
   const navigate = useNavigate();
   const groupedStories = groupStoriesByTag(realStories);
-  const [hoveredCard, setHoveredCard] = useState(null);
 
   return (
     <div style={styles.container}>
       <div style={styles.contentWrapper}>
         {/* Header Section */}
         <div style={styles.header}>
-          <h2 style={styles.mainTitle}>Real Stories</h2>
+          <h1 style={styles.mainTitle}>Real Stories</h1>
           <button onClick={() => navigate(-1)} style={styles.backButton}>
             ← Back
           </button>
@@ -51,59 +36,42 @@ function RealStories() {
           abuse and harassment. Their experiences empower and inspire.
         </p>
 
-        {/* Grouped stories with new card design */}
-        {Object.entries(groupedStories).map(([tag, stories]) => (
-          <div key={tag} style={styles.tagSection}>
-            <h3 style={styles.tagTitle}>{tag}</h3>
-            <div style={styles.cardList}>
-              {stories.map((story, index) => {
-                 const scheme = cardSchemes[index % cardSchemes.length];
-                 const isHovered = hoveredCard === story.id;
-
-                 return (
-                  <div
-                    key={story.id}
-                    style={{
-                      ...styles.card,
-                      background: `linear-gradient(145deg, rgba(255,255,255,0.9), ${scheme.bgColor})`,
-                      transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-                      boxShadow: isHovered ? '0 10px 25px rgba(109, 40, 217, 0.1)' : '0 4px 15px rgba(109, 40, 217, 0.07)',
-                    }}
-                    onClick={() => navigate(`/story/${story.id}`)} // Assumes a route like /story/:id exists
-                    onMouseEnter={() => setHoveredCard(story.id)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                  >
-                    <h4 style={{ ...styles.cardTitle, color: scheme.titleColor }}>{story.title}</h4>
-                    <p style={styles.cardSummary}>{story.summary}</p>
+        {/* Grouped stories in a simple, scrollable list */}
+        <div style={styles.sectionsContainer}>
+          {Object.entries(groupedStories).map(([tag, stories]) => (
+            <section key={tag} style={styles.tagSection}>
+              <h2 style={styles.tagTitle}>{tag}</h2>
+              <div style={styles.storyList}>
+                {stories.map((story) => (
+                  <div key={story.id} style={styles.storyCard}>
+                    <h3 style={styles.storyTitle}>{story.title}</h3>
+                    <p style={styles.storySummary}>{story.summary}</p>
                     <div style={styles.metadataContainer}>
-                        <div style={{...styles.metadataItem, color: scheme.metadataColor}}>
+                        <div style={styles.metadataItem}>
                             <MapPin size={14} style={styles.icon}/>{story.location}
                         </div>
-                        <div style={{...styles.metadataItem, color: scheme.metadataColor}}>
+                        <div style={styles.metadataItem}>
                             <Calendar size={14} style={styles.icon}/>{story.date}
                         </div>
                     </div>
-                    <div style={{...styles.cardAction, color: scheme.titleColor}}>
-                        <BookOpen size={16} />
-                        <span>Read Full Story</span>
-                    </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
+// Styles focused on a clean, spacious, non-interactive list
 const styles = {
     container: {
         minHeight: '100vh',
-        background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
+        background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)', 
         fontFamily: "'Inter', sans-serif",
-        padding: '24px 16px',
+        padding: '32px 16px',
     },
     contentWrapper: {
         maxWidth: '800px',
@@ -116,86 +84,86 @@ const styles = {
         marginBottom: '1rem',
     },
     mainTitle: {
-        fontSize: 'clamp(28px, 5vw, 36px)',
+        fontSize: 'clamp(32px, 5vw, 40px)',
         fontWeight: '700',
         fontFamily: "'Lora', serif",
-        color: '#6D28D9',
+        color: '#4C1D95',
         margin: 0,
     },
     backButton: {
         padding: '8px 16px',
         fontSize: '14px',
-        background: 'rgba(255, 255, 255, 0.6)',
+        background: 'transparent',
         color: '#6D28D9',
-        border: '1px solid rgba(255, 255, 255, 0.8)',
+        border: '1px solid rgba(109, 40, 217, 0.3)',
         borderRadius: '10px',
         cursor: 'pointer',
         fontWeight: '500',
-        transition: 'background-color 0.2s ease',
+        transition: 'all 0.2s ease',
     },
     introText: {
-        fontSize: 'clamp(15px, 2vw, 17px)',
-        lineHeight: '1.6',
-        color: '#4A5568',
-        marginBottom: '2.5rem',
+        fontSize: 'clamp(16px, 2vw, 18px)',
+        lineHeight: '1.7',
+        color: '#475569',
+        marginBottom: '3rem',
+        maxWidth: '720px',
     },
-    tagSection: {
-        marginBottom: '2.5rem',
-    },
-    tagTitle: {
-        fontSize: 'clamp(18px, 3vw, 22px)',
-        color: '#6D28D9',
-        fontWeight: '600',
-        marginBottom: '1rem',
-        paddingBottom: '8px',
-        borderBottom: '2px solid rgba(109, 40, 217, 0.2)',
-    },
-    cardList: {
-        display: 'grid',
-        gap: '16px',
-    },
-    card: {
-        padding: '20px',
-        borderRadius: '16px',
-        border: '1px solid rgba(255, 255, 255, 0.7)',
-        cursor: 'pointer',
-        transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+    sectionsContainer: {
         display: 'flex',
         flexDirection: 'column',
+        gap: '3rem', // Increased space between tag sections
     },
-    cardTitle: {
-        margin: '0 0 8px 0',
+    tagSection: {
+        // Each section for a tag
+    },
+    tagTitle: {
+        fontSize: 'clamp(20px, 3vw, 24px)',
+        color: '#4C1D95',
+        fontWeight: '600',
+        margin: '0 0 1.5rem 0',
+        paddingBottom: '12px',
+        borderBottom: '2px solid rgba(109, 40, 217, 0.2)',
+    },
+    storyList: {
+        display: 'grid',
+        gridTemplateColumns: '1fr', // Ensures one card per row
+        gap: '20px', // Space between cards in a section
+    },
+    storyCard: {
+        background: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: '16px',
+        padding: '20px',
+        border: '1px solid rgba(109, 40, 217, 0.1)',
+        boxShadow: '0 4px 15px rgba(109, 40, 217, 0.05)',
+    },
+    storyTitle: {
         fontSize: '18px',
         fontWeight: '600',
+        color: '#4C1D95',
+        margin: '0 0 8px 0',
     },
-    cardSummary: {
+    storySummary: {
         margin: '0 0 16px 0',
         fontSize: '15px',
-        lineHeight: '1.6',
-        color: '#4A5568',
-        flexGrow: 1,
+        lineHeight: '1.7',
+        color: '#334155',
     },
     metadataContainer: {
         display: 'flex',
-        gap: '16px',
-        marginBottom: '16px',
+        gap: '20px',
+        borderTop: '1px solid rgba(109, 40, 217, 0.15)',
+        paddingTop: '12px',
     },
     metadataItem: {
         display: 'flex',
         alignItems: 'center',
         fontSize: '13px',
         fontWeight: '500',
+        color: '#6D28D9',
     },
     icon: {
         marginRight: '6px',
     },
-    cardAction: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        fontWeight: '600',
-        fontSize: '14px',
-    }
 };
 
 export default RealStories;
