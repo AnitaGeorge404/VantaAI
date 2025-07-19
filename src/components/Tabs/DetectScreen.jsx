@@ -9,7 +9,7 @@ function DetectScreen() {
       title: 'Deepfake Detection',
       description: 'AI to spot facial manipulation and video tampering.',
       icon: SlidersHorizontal,
-      path: '/DeepfakeDetection',
+      path: '/DeepfakeDetector',
     },
     {
       title: 'AI Image Scanning',
