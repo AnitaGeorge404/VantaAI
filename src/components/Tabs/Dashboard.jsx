@@ -87,7 +87,7 @@ function Dashboard() {
       <header style={styles.header}>
         <h1 style={styles.title}>Vanta AI</h1>
         <div style={styles.profileChip}>
-          <User size={16} style={{ color: '#4A5568' }} />
+          <User size={16} style={{ color: '#501773' }} />
           <span style={styles.profileName}>Profile</span>
         </div>
       </header>
