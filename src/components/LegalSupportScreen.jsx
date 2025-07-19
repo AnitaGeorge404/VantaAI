@@ -22,7 +22,7 @@ function LegalSupportScreen() {
       title: 'Lawyer And NGO Directory',
       description: 'connenct with lawyers and NGOs.',
       icon: BookAIcon, 
-      path: '/LawyerDirectory',
+      path: '/Directory',
     },
   ];
 
