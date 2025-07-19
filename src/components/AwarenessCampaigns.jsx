@@ -34,7 +34,7 @@ function AwarenessCampaigns() {
           padding: '0 1rem',
         }}
       >
-        Featured:{" "}
+        {" "}
         <span style={{ fontWeight: "600" }}>
           Join the movement to stop online harassment and build a safer internet for women.
         </span>
