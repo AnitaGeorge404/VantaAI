@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Gavel, Lightbulb } from 'lucide-react'; 
+import { BookAIcon, Gavel, Lightbulb } from 'lucide-react'; 
 import BottomNav from './Tabs/BottomNav';
 
 function LegalSupportScreen() {
@@ -17,6 +17,12 @@ function LegalSupportScreen() {
       description: 'Browse your legal protections in simple language.',
       icon: Lightbulb, 
       path: '/KnowYourRightsHub',
+    },
+    {
+      title: 'Lawyer And NGO Directory',
+      description: 'connenct with lawyers and NGOs.',
+      icon: BookAIcon, 
+      path: '/LawyerDirectory',
     },
   ];
 
