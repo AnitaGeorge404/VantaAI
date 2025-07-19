@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Scale,
@@ -7,7 +7,7 @@ import {
   Megaphone
 } from 'lucide-react';
 
-// Data for the rights sections (content only)
+// Data for the rights sections
 const rightsData = [
   {
     title: "Laws & Rights",
@@ -35,24 +35,20 @@ const rightsData = [
   },
 ];
 
-// --- THIS IS THE KEY PART FOR THE TWO-COLOR SCHEME ---
-// We define ONLY two color themes in this array.
+// Alternating color schemes
 const cardSchemes = [
-  {
-    // Theme 1: Blue
-    bgColor: '#EFF6FF', 
-    iconColor: '#3B82F6',
-    titleColor: '#1E3A8A',
-  },
-  {
-    // Theme 2: Pink/Red
-    bgColor: '#FEF2F2', 
-    iconColor: '#F43F5E',
-    titleColor: '#881337',
-  }
+  { bgColor: '#EFF6FF', iconColor: '#3B82F6', titleColor: '#1E3A8A' },
+  { bgColor: '#FEF2F2', iconColor: '#F43F5E', titleColor: '#881337' }
 ];
 
 function KnowYourRightsHub() {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   return (
     <>
       <div style={styles.container}>
@@ -64,10 +60,6 @@ function KnowYourRightsHub() {
         <main style={styles.grid}>
           {rightsData.map((card, index) => {
             const IconComponent = card.icon;
-            
-            // This line alternates between the 2 color schemes.
-            // For index 0, 2, 4... it picks scheme 0 (Blue).
-            // For index 1, 3, 5... it picks scheme 1 (Pink/Red).
             const scheme = cardSchemes[index % 2];
 
             return (
@@ -99,11 +91,10 @@ function KnowYourRightsHub() {
 
 const styles = {
   container: {
-    minHeight: '100vh',
+    height: '100vh',
     maxHeight: '100dvh',
     overflow: 'hidden',
-    padding: '16px',
-    paddingBottom: '0',
+    padding: '16px 16px 0 16px',
     background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
     fontFamily: "'Inter', sans-serif",
     display: 'flex',
@@ -127,7 +118,8 @@ const styles = {
     fontSize: '14px',
     color: '#555',
     marginBottom: '20px',
-    fontFamily: "'Inter', sans-serif",
+    // --- THIS LINE IS NOW FIXED ---
+    fontFamily: "'Inter', sans-serif", 
     flexShrink: 0,
   },
   grid: {
