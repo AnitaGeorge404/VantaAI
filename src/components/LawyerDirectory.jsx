@@ -1,162 +1,237 @@
-import React, { useState } from "react";
-import lawyerNGOData from "../data/lawyerNgoDirectory";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import lawyerNGOData from "../data/lawyerNgoDirectory";
+
+import { 
+  Search, 
+  ArrowLeft,
+  Scale,
+  Building,
+  Shield,
+  ChevronUp, 
+  ChevronDown,
+  ExternalLink
+} from "lucide-react";
 
 function LawyerDirectory() {
   const [openIndex, setOpenIndex] = useState(null);
-  const [search, setSearch] = useState("");
+  const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
+
+  const filteredData = useMemo(() => {
+    if (!searchText) {
+      return lawyerNGOData;
+    }
+    const lowercasedSearch = searchText.toLowerCase();
+    return lawyerNGOData.filter(
+      (entry) =>
+        entry.name.toLowerCase().includes(lowercasedSearch) ||
+        entry.location.toLowerCase().includes(lowercasedSearch)
+    );
+  }, [searchText]);
 
   const toggleIndex = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const getIcon = (type) => {
+  const getTypeIcon = (type) => {
     switch (type) {
-      case "Lawyer": return "⚖️";
-      case "NGO": return "🏢";
-      case "Government": return "🛡️";
-      default: return "📌";
+      case "Lawyer": return <Scale size={20} style={{ marginRight: '8px' }} />;
+      case "NGO": return <Building size={20} style={{ marginRight: '8px' }} />;
+      case "Government": return <Shield size={20} style={{ marginRight: '8px' }} />;
+      default: return null;
     }
   };
-
-  const filteredData = lawyerNGOData.filter((entry) =>
-    entry.name.toLowerCase().includes(search.toLowerCase()) ||
-    entry.location.toLowerCase().includes(search.toLowerCase())
-  );
+  
+  const formatContact = (contact) => {
+    if (contact.includes('@')) {
+      return <a href={`mailto:${contact}`} style={styles.contactLink}>{contact}</a>;
+    }
+    if (contact.match(/^[0-9\s+-]+$/)) {
+      return <a href={`tel:${contact.replace(/\s/g, '')}`} style={styles.contactLink}>{contact}</a>;
+    }
+    return contact;
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(to bottom, #C2E8FF, #DEE6FF, #E5C8FF)",
-        fontFamily: "Inter, sans-serif",
-        color: "#43016E",
-        padding: "2rem",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      {/* Header */}
-      <div style={{ width: "100%", maxWidth: "850px" }}>
-        <div style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1.5rem",
-        }}>
-          <h2 style={{
-            fontSize: "clamp(24px, 5vw, 36px)",
-            fontWeight: "bold",
-            margin: 0,
-          }}>
-            Lawyer & NGO Directory
-          </h2>
-          <button
-            onClick={() => navigate("/rights")}
-            style={{
-              padding: "6px 12px",
-              fontSize: "clamp(12px, 2vw, 14px)",
-              background: "#EEE5F6",
-              color: "#43016E",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            ← Back to Hub
-          </button>
+    <div style={styles.page}>
+      <header style={styles.header}>
+        <div style={styles.headerContent}>
+          <h1 style={styles.title}>Lawyer & NGO Directory</h1>
         </div>
+        
+        <div style={styles.searchContainer}>
+          <Search size={20} style={styles.searchIcon} />
+          <input
+            type="text"
+            placeholder="Search by name or location (e.g., 'Anjali Kumar' or 'Kollam')"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={styles.searchInput}
+          />
+        </div>
+      </header>
 
-        {/* Search bar */}
-        <input
-          type="text"
-          placeholder="Search by name or location"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "0.75rem 1rem",
-            fontSize: "16px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            marginBottom: "1.5rem",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          }}
-        />
-      </div>
-
-      {/* Directory cards */}
-      <div style={{ maxWidth: "850px", width: "100%" }}>
+      <main style={styles.directoryList}>
         {filteredData.length === 0 ? (
-          <p style={{ fontSize: "16px", fontStyle: "italic", textAlign: "center" }}>
-            No matching entries found.
-          </p>
+          <p style={styles.noResults}>No matching entries found.</p>
         ) : (
           filteredData.map((entry, index) => (
-            <div
-              key={index}
-              style={{
-                marginBottom: "1rem",
-                background: "#f4eaff",
-                borderRadius: "10px",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                transition: "transform 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.01)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1.0)")}
-            >
+            <div key={index} style={styles.card}>
               <button
                 onClick={() => toggleIndex(index)}
-                style={{
-                  width: "100%",
-                  padding: "1rem",
-                  fontSize: "clamp(16px, 2vw, 20px)",
-                  fontWeight: "600",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "#43016E",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
+                style={styles.cardHeader}
+                aria-expanded={openIndex === index}
+                aria-controls={`details-${index}`}
               >
-                <span>
-                  {getIcon(entry.type)} {entry.name}
+                <span style={styles.cardTitle}>
+                  {getTypeIcon(entry.type)}
+                  {entry.name}
                 </span>
-                <span>{openIndex === index ? "▲" : "▼"}</span>
+                {openIndex === index ? <ChevronUp /> : <ChevronDown />}
               </button>
 
               {openIndex === index && (
-                <div style={{ padding: "0 1rem 1rem", fontSize: "clamp(14px, 1.7vw, 17px)" }}>
-                  <p style={{ margin: "0.5rem 0" }}><strong>Type:</strong> {entry.type}</p>
-                  <p style={{ margin: "0.5rem 0" }}><strong>Description:</strong> {entry.description}</p>
-                  <p style={{ margin: "0.5rem 0" }}><strong>Location:</strong> {entry.location}</p>
-                  <p style={{ margin: "0.5rem 0" }}><strong>Contact:</strong> {entry.contact}</p>
-                  <p style={{ margin: "0.5rem 0" }}>
-                    <a
-                      href={entry.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        color: "#5B2EFF",
-                        textDecoration: "underline",
-                      }}
-                    >
-                      🔗 Visit Website
-                    </a>
-                  </p>
+                <div id={`details-${index}`} style={styles.cardBody}>
+                  <p><strong>Type:</strong> {entry.type}</p>
+                  <p><strong>Description:</strong> {entry.description}</p>
+                  <p><strong>Location:</strong> {entry.location}</p>
+                  <p><strong>Contact:</strong> {formatContact(entry.contact)}</p>
+                  <a
+                    href={entry.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.websiteLink}
+                  >
+                    Visit Website <ExternalLink size={14} />
+                  </a>
                 </div>
               )}
             </div>
           ))
         )}
-      </div>
+      </main>
     </div>
   );
 }
+
+const styles = {
+  page: {
+    minHeight: '100vh',
+    // --- THIS LINE IS NOW UPDATED ---
+    background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
+    fontFamily: "'Inter', sans-serif",
+    color: '#333',
+    padding: '2rem 1rem',
+  },
+  header: {
+    width: '100%',
+    maxWidth: '850px',
+    margin: '0 auto 2rem auto',
+  },
+  headerContent: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '1.5rem',
+  },
+  title: {
+    fontSize: "clamp(24px, 5vw, 32px)",
+    fontWeight: '700',
+    fontFamily: "'Lora', serif",
+    color: '#43016E',
+    margin: 0,
+  },
+  backButton: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 14px',
+    fontSize: "clamp(12px, 2vw, 14px)",
+    background: '#E5C8FF',
+    color: '#43016E',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontWeight: '500',
+    transition: 'background-color 0.2s',
+  },
+  searchContainer: {
+    position: 'relative',
+  },
+  searchInput: {
+    width: '100%',
+    padding: '1rem 1rem 1rem 2.75rem',
+    fontSize: '16px',
+    borderRadius: '12px',
+    border: '1px solid #d1d5db',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    boxSizing: 'border-box',
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: '1rem',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#6b7280',
+  },
+  directoryList: {
+    maxWidth: '850px',
+    width: '100%',
+    margin: '0 auto',
+  },
+  noResults: {
+    fontSize: '16px',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    color: '#555',
+  },
+  card: {
+    marginBottom: '1rem',
+    background: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: '12px',
+    boxShadow: '0 4px 15px rgba(67, 1, 110, 0.07)',
+    border: '1px solid #E5C8FF',
+    overflow: 'hidden',
+    transition: 'box-shadow 0.2s ease',
+  },
+  cardHeader: {
+    width: '100%',
+    padding: '1rem 1.25rem',
+    fontSize: 'clamp(16px, 2vw, 18px)',
+    fontWeight: '600',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#43016E',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    textAlign: 'left',
+  },
+  cardTitle: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  cardBody: {
+    padding: '0 1.25rem 1.25rem',
+    fontSize: 'clamp(14px, 1.7vw, 16px)',
+    lineHeight: '1.6',
+    borderTop: '1px solid #eee',
+  },
+  contactLink: {
+    color: '#5B2EFF',
+    textDecoration: 'none',
+    fontWeight: '500',
+  },
+  websiteLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    marginTop: '0.5rem',
+    color: '#5B2EFF',
+    textDecoration: 'none',
+    fontWeight: '500',
+  }
+};
 
 export default LawyerDirectory;
