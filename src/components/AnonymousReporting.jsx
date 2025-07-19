@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
-import { supabase } from '../supabaseClient'; // Using the '@' alias
+import { supabase } from '../supabaseClient';
 
-// --- NEW Full Screen UI Styles ---
 const styles = {
-  // This new 'page' style creates the full-screen background and centers the form
   page: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: '100vh',
     padding: '20px',
-    background: 'linear-gradient(170deg, #F7F5FF 0%, #E6E0F8 100%)', // Lovely gradient
+    background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
     fontFamily: "'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif",
+    // --- FIX: Prevents padding from causing horizontal overflow ---
+    boxSizing: 'border-box',
   },
-  // The container style has been slightly adjusted
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Slightly transparent white for a softer look
-    backdropFilter: 'blur(10px)', // Glassmorphism effect
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backdropFilter: 'blur(10px)',
     padding: '40px',
     borderRadius: '24px',
-    boxShadow: '0 8px 32px 0 rgba(106, 90, 205, 0.2)', // Softer shadow
+    boxShadow: '0 8px 32px 0 rgba(106, 90, 205, 0.2)',
     maxWidth: '500px',
     width: '100%',
     border: '1px solid rgba(255, 255, 255, 0.18)',
@@ -27,7 +26,7 @@ const styles = {
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '25px', // Increased gap for more breathing room
+    gap: '25px',
   },
   header: {
     marginBottom: '5px',
@@ -58,6 +57,14 @@ const styles = {
     width: '100%',
     boxSizing: 'border-box',
     color: '#333',
+  },
+  fileInput: {
+    border: '1px solid #E6E0F8',
+    borderRadius: '10px',
+    padding: '10px',
+    fontSize: '0.9em',
+    color: '#483D8B',
+    backgroundColor: 'white',
   },
   textarea: {
     backgroundColor: '#FFFFFF',
@@ -104,43 +111,65 @@ const styles = {
     borderRadius: '10px',
     textAlign: 'center',
     fontWeight: 'bold',
+    marginTop: '10px',
   }
 };
 
 
 const AnonymousReporting = () => {
-  const [imageUrl, setImageUrl] = useState('');
+  const [file, setFile] = useState(null);
   const [reason, setReason] = useState('');
   const [details, setDetails] = useState('');
   const [status, setStatus] = useState('idle');
+  const [formError, setFormError] = useState('');
   const [isHovered, setIsHovered] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!imageUrl || !reason) {
-      alert('Please provide the image URL and a reason for the report.');
+    setFormError('');
+
+    if (!file || !reason) {
+      setFormError('Please upload an image and select a reason.');
       return;
     }
+    
     setStatus('submitting');
+    
     try {
-      const { error } = await supabase
+      const fileName = `${Date.now()}_${file.name}`;
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from('report-images')
+        .upload(fileName, file);
+
+      if (fileError) throw fileError;
+
+      const { data: urlData } = supabase.storage
+        .from('report-images')
+        .getPublicUrl(fileName);
+      
+      const imageUrl = urlData.publicUrl;
+
+      const { error: insertError } = await supabase
         .from('reports')
         .insert([{ image_url: imageUrl, reason: reason, details: details }]);
-      if (error) { throw error; }
+        
+      if (insertError) { throw insertError; }
+
       setStatus('success');
       setTimeout(() => {
         setStatus('idle');
-        setImageUrl('');
+        setFile(null);
         setReason('');
         setDetails('');
       }, 4000);
+
     } catch (err) {
       console.error('Submission failed:', err);
+      setFormError('Submission failed. Please try again.');
       setStatus('error');
     }
   };
 
-  // The main component now returns a full-page wrapper `div`
   return (
     <div style={styles.page}>
       {status === 'success' ? (
@@ -157,14 +186,13 @@ const AnonymousReporting = () => {
           </p>
           <form onSubmit={handleSubmit} style={styles.form}>
             <div>
-              <label htmlFor="imageUrl" style={styles.label}>URL of the Harmful Image*</label>
+              <label htmlFor="fileUpload" style={styles.label}>Upload Screenshot/Image*</label>
               <input
-                type="url"
-                id="imageUrl"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                style={styles.input}
-                placeholder="https://example.com/image.jpg"
+                type="file"
+                id="fileUpload"
+                onChange={(e) => setFile(e.target.files[0])}
+                style={styles.fileInput}
+                accept="image/*"
                 required
               />
             </div>
@@ -173,7 +201,7 @@ const AnonymousReporting = () => {
               <select
                 id="reason"
                 value={reason}
-                onChange={(e) => setReason(e.e.target.value)}
+                onChange={(e) => setReason(e.target.value)}
                 style={styles.input}
                 required
               >
@@ -197,7 +225,9 @@ const AnonymousReporting = () => {
                 placeholder="Provide any extra information that might be helpful."
               />
             </div>
-            {status === 'error' && <p style={styles.feedbackError}>Something went wrong. Please try again.</p>}
+
+            {formError && <p style={styles.feedbackError}>{formError}</p>}
+            
             <button
               type="submit"
               style={{ ...styles.button, ...(isHovered ? styles.buttonHover : null) }}
