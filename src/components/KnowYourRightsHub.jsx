@@ -1,95 +1,110 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Scale,          // For Laws & Rights
-  MessageSquareQuote, // For Real Stories
-  HelpCircle,     // For Legal Tips & FAQs
-  Megaphone       // For Awareness Campaigns
+  Scale,
+  MessageSquareQuote,
+  HelpCircle,
+  Megaphone
 } from 'lucide-react';
 
-// Data for the rights sections, combining original content with new icons
+// Data for the rights sections (content only)
 const rightsData = [
   {
     title: "Laws & Rights",
-    description: "Understand your legal protections. Learn about Indian laws that safeguard you from online abuse, stalking, and privacy violations.",
+    description: "Understand Indian laws that safeguard you from online abuse and stalking.",
     icon: Scale,
     path: "/rights/laws-&-rights",
-    bgColor: "#F7CFC7", // Original color
-    textColor: "#581C0E", // A darker, accessible text color for this background
   },
   {
     title: "Real Stories",
-    description: "Real people. Real action. Explore true cases of digital abuse victims who fought back using legal tools — and how you can too.",
+    description: "Explore true cases of victims who fought back using legal tools.",
     icon: MessageSquareQuote,
     path: "/know-your-rights/real-stories",
-    bgColor: "#C2F0F5", // Original color
-    textColor: "#084C55", // A darker, accessible text color
   },
   {
     title: "Legal Tips & FAQs",
-    description: "What to do when things go wrong. Find actionable advice for reporting cybercrimes, collecting evidence, and protecting yourself legally.",
+    description: "Find actionable advice for reporting cybercrimes and collecting evidence.",
     icon: HelpCircle,
     path: "/know-your-rights/legal-tips",
-    bgColor: "#E5C8FF", // Original color
-    textColor: "#43016E", // Original color, still works well
   },
   {
     title: "Awareness Campaigns",
-    description: "Stay informed. Stay safe. Access posters, helplines, and digital safety campaigns that promote responsible tech use and legal awareness.",
+    description: "Access posters, helplines, and digital safety campaign materials.",
     icon: Megaphone,
     path: "/know-your-rights/awareness-campaigns",
-    bgColor: "#F7C7F0", // Original color
-    textColor: "#63105B", // A darker, accessible text color
   },
+];
+
+// --- THIS IS THE KEY PART FOR THE TWO-COLOR SCHEME ---
+// We define ONLY two color themes in this array.
+const cardSchemes = [
+  {
+    // Theme 1: Blue
+    bgColor: '#EFF6FF', 
+    iconColor: '#3B82F6',
+    titleColor: '#1E3A8A',
+  },
+  {
+    // Theme 2: Pink/Red
+    bgColor: '#FEF2F2', 
+    iconColor: '#F43F5E',
+    titleColor: '#881337',
+  }
 ];
 
 function KnowYourRightsHub() {
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1 style={styles.title}>Know Your Rights Hub</h1>
-      </header>
+    <>
+      <div style={styles.container}>
+        <header style={styles.header}>
+          <h1 style={styles.title}>Know Your Rights</h1>
+        </header>
+        <p style={styles.subtext}>Your comprehensive guide to digital safety and legal empowerment.</p>
 
-      <main style={styles.grid}>
-        {rightsData.map((card, index) => {
-          const IconComponent = card.icon;
-          return (
-            <Link 
-              key={index} 
-              to={card.path} 
-              style={{
-                ...styles.card,
-                // Use the specific background color for a nice gradient effect
-                background: `linear-gradient(145deg, rgba(255,255,255,0.8), ${card.bgColor})`,
-              }}
-            >
-              <div style={{ ...styles.iconContainer, color: card.textColor }}>
-                 <IconComponent size={24} />
-              </div>
-              <h3 style={{ ...styles.cardTitle, color: card.textColor }}>
-                {card.title}
-              </h3>
-              <p style={{ ...styles.cardDescription, color: card.textColor, opacity: 0.8 }}>
-                {card.description}
-              </p>
-            </Link>
-          );
-        })}
-      </main>
-      
-      {/* If you have a BottomNav component, you can place it here */}
-      {/* <BottomNav /> */}
-    </div>
+        <main style={styles.grid}>
+          {rightsData.map((card, index) => {
+            const IconComponent = card.icon;
+            
+            // This line alternates between the 2 color schemes.
+            // For index 0, 2, 4... it picks scheme 0 (Blue).
+            // For index 1, 3, 5... it picks scheme 1 (Pink/Red).
+            const scheme = cardSchemes[index % 2];
+
+            return (
+              <Link 
+                key={index} 
+                to={card.path} 
+                style={{
+                  ...styles.card,
+                  background: `linear-gradient(145deg, rgba(255,255,255,0.9), ${scheme.bgColor})`,
+                }}
+              >
+                <div style={{ ...styles.iconContainer, color: scheme.iconColor }}>
+                   <IconComponent size={20} />
+                </div>
+                <h3 style={{ ...styles.cardTitle, color: scheme.titleColor }}>
+                  {card.title}
+                </h3>
+                <p style={styles.cardText}>
+                  {card.description}
+                </p>
+              </Link>
+            );
+          })}
+        </main>
+      </div>
+    </>
   );
 }
 
-// Styles inspired by the Dashboard component
 const styles = {
   container: {
     minHeight: '100vh',
-    overflow: 'hidden', 
-    padding: '16px 16px 0 16px',
-    background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)', 
+    maxHeight: '100dvh',
+    overflow: 'hidden',
+    padding: '16px',
+    paddingBottom: '0',
+    background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
     fontFamily: "'Inter', sans-serif",
     display: 'flex',
     flexDirection: 'column',
@@ -98,63 +113,67 @@ const styles = {
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingBottom: '20px',
+    paddingBottom: '10px',
     flexShrink: 0,
   },
   title: {
-    fontSize: 'clamp(24px, 5vw, 28px)',
+    fontSize: '24px',
     fontWeight: '700',
     fontFamily: "'Lora', serif",
     color: '#6D28D9',
-    textAlign: 'center',
-    width: '100%',
+    marginBottom: '6px',
+  },
+  subtext: {
+    fontSize: '14px',
+    color: '#555',
+    marginBottom: '20px',
+    fontFamily: "'Inter', sans-serif",
+    flexShrink: 0,
   },
   grid: {
-    flexGrow: 1, 
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', // Responsive grid
-    gap: '20px', 
-    overflowY: 'auto', 
-    minHeight: 0,
-    paddingBottom: '100px', // Space for bottom nav or just padding
-    // Hide scrollbar for a cleaner look
-    msOverflowStyle: 'none',
-    scrollbarWidth: 'none',
-    '::-webkit-scrollbar': { 
-        display: 'none',
-    }
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '16px',
+    overflowY: 'auto',
+    flexGrow: 1,
+    paddingBottom: '100px',
   },
   card: {
-    borderRadius: '20px',
-    padding: '24px',
+    flex: '1 1 calc(50% - 8px)',
+    minHeight: '180px',
+    padding: '16px',
+    borderRadius: '16px',
     textDecoration: 'none',
-    boxShadow: '0 8px 25px rgba(109, 40, 217, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.7)',
+    color: 'inherit',
+    boxShadow: '0 4px 12px rgba(109, 40, 217, 0.1)',
+    border: '1px solid rgba(255, 255, 255, 0.6)',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    transition: 'transform 0.2s ease',
   },
   iconContainer: {
-    width: '48px',
-    height: '48px',
+    width: '40px',
+    height: '40px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: '16px',
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    marginBottom: '16px'
+    borderRadius: '12px',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    marginBottom: '12px'
   },
   cardTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
+    fontSize: '16px',
+    fontWeight: 'bold',
     fontFamily: "'Lora', serif",
-    margin: '0 0 8px 0',
+    margin: '0 0 4px 0',
   },
-  cardDescription: {
-    fontSize: '14px',
-    lineHeight: '1.6',
+  cardText: {
+    fontSize: '13px',
+    color: '#4A5568',
+    lineHeight: '1.5',
     margin: 0,
+    fontFamily: "'Inter', sans-serif",
   },
 };
 
