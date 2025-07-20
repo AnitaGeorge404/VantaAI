@@ -1,34 +1,36 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import BottomNav from './BottomNav';
-import { ShieldAlert, Fingerprint } from 'lucide-react'; // Modernized icons
+import { ShieldAlert, Fingerprint } from 'lucide-react'; 
 
 function PreventScreen() {
   const cardData = [
     {
-      title: 'In-App Warnings',
-      description: 'Real-time alerts when risk is detected during uploads.',
-      icon: ShieldAlert, // Changed icon
-      path: '/InAppWarnings',
-    },
-    {
       title: 'Digital Watermarking',
       description: 'Invisible tracing to prevent image misuse and leaks.',
-      icon: Fingerprint, // Changed icon
+      icon: Fingerprint, 
       path: '/DigitalWatermarking',
     },
+    {
+      title: 'In-App Warnings',
+      description: 'Real-time alerts when risk is detected during uploads.',
+      icon: ShieldAlert, 
+      path: '/InAppWarnings',
+    },
+  
   ];
 
   const cardSchemes = [
-    {
-      bgColor: '#EFF6FF',
-      iconColor: '#3B82F6',
-      titleColor: '#1E3A8A',
-    },
+    
     {
       bgColor: '#FEF2F2',
       iconColor: '#F43F5E',
       titleColor: '#881337',
+    },
+    {
+      bgColor: '#EFF6FF',
+      iconColor: '#3B82F6',
+      titleColor: '#1E3A8A',
     }
   ];
 
@@ -36,7 +38,7 @@ function PreventScreen() {
     <>
       <div style={styles.container}>
         <header style={styles.header}>
-          <h1 style={{...styles.title, color: '#DC2626'}}>Prevent</h1>
+          <h1 style={{...styles.title, color: '#6D28D9'}}>Protect Yourself</h1>
         </header>
         <p style={styles.subtext}>Stay ahead. Use tools to prevent misuse before it begins.</p>
 
