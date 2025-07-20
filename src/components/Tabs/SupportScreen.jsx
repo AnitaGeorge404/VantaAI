@@ -7,13 +7,13 @@ function SupportScreen() {
   const cardData = [
     {
       title: 'Chatbot',
-      description: 'An emotional chatbot designed to understand and respond to human feelings with empathy',
+      description: 'Understands and responds to human feelings with empathy',
       icon: MessageSquareText, 
       path: '/emotionalsupport',
     },
     {
       title: 'Community Support',
-      description: 'A community support feature that provides access to various trusted platforms',
+      description: 'Provides access to various trusted platforms',
       icon: BrainCircuit, 
       path: '/mentalhealth',
     },

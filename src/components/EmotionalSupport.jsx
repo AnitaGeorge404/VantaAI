@@ -273,7 +273,6 @@ const styles = {
     fontSize: '16px',
     background: '#fff',
     outline: 'none',
-    // MODIFIED: Added color property to make the typing text purple
     color: '#43016E',
   },
   sendButton: {

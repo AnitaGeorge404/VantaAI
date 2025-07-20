@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import realStories from "../data/realStories";
 import { MapPin, Calendar } from 'lucide-react';
 
-// This function remains unchanged
 function groupStoriesByTag(stories) {
   const grouped = {};
   stories.forEach((story) => {
