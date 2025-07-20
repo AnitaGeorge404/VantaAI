@@ -10,7 +10,7 @@ function BottomNav() {
     { path: '/prevent', icon: ShieldCheck, label: 'Prevention' },
     { path: '/detect', icon: Search, label: 'Detection' },
     { path: '/report', icon: FileText, label: 'Reporting' },
-    { path: '/support', icon: Heart, label: 'Support' }
+    { path: '/legal', icon: Heart, label: 'Support' }
   ];
 
   return (
