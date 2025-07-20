@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import BottomNav from './BottomNav';
-import { Search, Image, SlidersHorizontal } from 'lucide-react';
+import { Image, SlidersHorizontal, ShieldAlert } from 'lucide-react'; 
 
 function DetectScreen() {
   const cardData = [
@@ -16,6 +16,12 @@ function DetectScreen() {
       description: 'Analyze photos for signs of nudity, edits, or misuse.',
       icon: Image,
       path: '/ImageScanning',
+    },
+    {
+      title: 'Harassment Detector',
+      description: 'Scan texts and DMs for bullying, threats, and toxic language.',
+      icon: ShieldAlert,
+      path: '/harassment',
     },
   ];
 
@@ -113,6 +119,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    minWidth: '140px', 
   },
   iconContainer: {
     width: '40px',
