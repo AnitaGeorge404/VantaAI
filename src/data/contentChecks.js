@@ -1,4 +1,3 @@
-// src/utils/contentChecks.js
 import { runToxicityAnalysis } from "./mlAnalyser";
 
 const NSFW_KEYWORDS = [
@@ -34,70 +33,77 @@ export async function analyzeContentTrust(content) {
   let ruleScore = 100;
   let reasons = [];
 
-  // 1. NSFW keyword detection
+  // === NSFW Detection ===
   const nsfwMatches = NSFW_KEYWORDS.filter(w => lower.includes(w));
   if (nsfwMatches.length > 0) {
     ruleScore -= nsfwMatches.length * 10;
-    reasons.push("NSFW content");
+    reasons.push("NSFW keywords detected");
   }
 
-  // 2. Toxic keyword detection
+  // === Toxic Language Detection ===
   const toxicMatches = TOXIC_KEYWORDS.filter(w => lower.includes(w));
   if (toxicMatches.length > 0) {
     ruleScore -= toxicMatches.length * 8;
-    reasons.push("Toxic language");
+    reasons.push("Toxic language detected");
   }
 
-  // 3. Suspicious domain detection
+  // === Suspicious Domain Detection ===
   const domainMatches = SUSPICIOUS_DOMAINS.filter(regex => regex.test(lower));
   if (domainMatches.length > 0) {
-    ruleScore -= domainMatches.length * 15;
-    reasons.push("Suspicious domain");
+    ruleScore -= domainMatches.length * 12;
+    reasons.push("Suspicious link or domain");
   }
 
-  // 4. Dangerous file type detection
-  const fileTypeMatches = SUSPICIOUS_FILE_TYPES.filter(ext => lower.endsWith(ext));
-  fileTypeMatches.forEach(ext => {
-    if (ext === ".exe" || ext === ".apk") {
-      ruleScore -= 40;
-      reasons.push("Dangerous file type: " + ext);
-    } else {
-      ruleScore -= 20;
-      reasons.push("Suspicious file type: " + ext);
+  // === Dangerous File Type Detection ===
+  SUSPICIOUS_FILE_TYPES.forEach(ext => {
+    if (lower.endsWith(ext)) {
+      if (ext === ".exe" || ext === ".apk") {
+        ruleScore -= 35;
+        reasons.push(`Dangerous file type: ${ext}`);
+      } else {
+        ruleScore -= 20;
+        reasons.push(`Suspicious file type: ${ext}`);
+      }
     }
   });
 
-  // 5. Spoof brand phishing detection
+  // === Spoofed Brand Phishing Detection ===
   const spoofMatch = SPOOF_BRANDS.find(brand =>
     lower.includes(brand) &&
     (lower.includes("login") || lower.includes("secure") || lower.includes("account"))
   );
   if (spoofMatch) {
     ruleScore -= 25;
-    reasons.push(`Spoofed brand phishing attempt (${spoofMatch})`);
+    reasons.push(`Spoofed brand phishing attempt: ${spoofMatch}`);
   }
 
-  // 6. ML-based toxicity detection
+  // === ML Toxicity Detection ===
   let mlScore = 100;
   try {
     const mlResult = await runToxicityAnalysis(content); // { toxic: true/false, score: 0–1 }
-    const mlConfidence = 1 - mlResult.score;
-    mlScore = Math.round(mlConfidence * 100);
+
     if (mlResult.toxic) {
-      reasons.push("ML-flagged as toxic");
+      const penalty = Math.round(mlResult.score * 100); // e.g. 0.85 → -85
+      mlScore = 100 - penalty;
+      if (penalty >= 70) {
+        reasons.push(`Highly toxic (ML score: ${mlResult.score.toFixed(2)})`);
+      } else {
+        reasons.push(`Mild toxicity flagged (ML score: ${mlResult.score.toFixed(2)})`);
+      }
     }
   } catch (err) {
     console.error("ML toxicity analysis failed:", err);
-    reasons.push("ML model error (ignored)");
+    mlScore = 85; // fallback score
+    reasons.push("ML model error – fallback trust score used");
   }
 
-  // Combine rule-based and ML score (weighted)
-  let finalScore = Math.round(0.6 * ruleScore + 0.4 * mlScore);
-  finalScore = Math.max(0, Math.min(100, finalScore)); // Clamp to [0, 100]
+  // === Final Blended Score ===
+  let finalScore = Math.round((ruleScore + mlScore) / 2);
+  finalScore = Math.max(0, Math.min(100, finalScore)); // Clamp between 0–100
 
   return {
     score: finalScore,
     isSuspicious: finalScore < 70,
-    reason: reasons.length > 0 ? reasons.join(" + ") : "No obvious red flags"
+    reason: reasons.length ? reasons.join(" + ") : "No obvious red flags"
   };
 }
