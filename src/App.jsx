@@ -6,6 +6,9 @@ import PreventScreen from './components/Tabs/PreventScreen';
 import DetectScreen from './components/Tabs/DetectScreen';
 import ReportScreen from './components/Tabs/ReportScreen';
 import SupportScreen from './components/Tabs/SupportScreen';
+import Index from './components/Tabs/Index';
+import Welcome from './components/Tabs/Welcome';
+import SignIn from './components/Tabs/SignIn';
 
 import InAppWarnings from './components/InAppWarnings';
 import DigitalWatermarking from './components/DigitalWatermarking';
@@ -27,12 +30,16 @@ import RealStories from "./components/RealStories";
 import LegalTips from "./components/LegalTips";
 import AwarenessCampaigns from "./components/AwarenessCampaigns";
 import LawyerDirectory from "./components/LawyerDirectory";
+import NotFound from './components/Tabs/NotFound';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+       
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/" element={<Welcome />} />
         <Route path="/prevent" element={<PreventScreen />} />
         <Route path="/detect" element={<DetectScreen />} />
         <Route path="/report" element={<ReportScreen />} />
@@ -60,7 +67,7 @@ function App() {
         <Route path="/know-your-rights/awareness-campaigns" element={<AwarenessCampaigns />} />
         <Route path="/directory" element={<LawyerDirectory />} />
 
-        <Route path="*" element={<Dashboard />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

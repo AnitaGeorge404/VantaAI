@@ -6,7 +6,7 @@ function BottomNav() {
   const { pathname } = useLocation();
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Home' },
+    { path: '/dashboard', icon: Home, label: 'Home' },
     { path: '/prevent', icon: ShieldCheck, label: 'Prevention' },
     { path: '/detect', icon: Search, label: 'Detection' },
     { path: '/report', icon: FileText, label: 'Reporting' },
