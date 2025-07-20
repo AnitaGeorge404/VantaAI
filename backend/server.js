@@ -28,11 +28,10 @@ const hardcodedReplies = {
   "how does vanta ai work": "Vanta AI uses AI to help detect, prevent, and respond to digital threats in real-time.",
   "i am mentally broken": "To feel mentally broken after what you've been through makes complete sense. You don't have to go through this alone — I'm here for you.",
   "do you store my data": "No, I don’t store or track anything. Vanta AI runs locally to protect your privacy.",
-"are you from microsoft": "No, I’m not. Vanta AI was built by a hackathon team using open-source models.",
-"who made you": "I was created during a digital safety hackathon to help users stay safe online.",
-"can you track me": "No, I cannot track or monitor anything you do.",
-"is my data safe": "Yes. Vanta AI processes everything locally and does not share or store your data.",
-
+  "are you from microsoft": "No, I’m not. Vanta AI was built by a hackathon team using open-source models.",
+  "who made you": "I was created during a digital safety hackathon to help users stay safe online.",
+  "can you track me": "No, I cannot track or monitor anything you do.",
+  "is my data safe": "Yes. Vanta AI processes everything locally and does not share or store your data.",
 };
 
 // 🔍 Fuzzy matching
@@ -44,6 +43,15 @@ function getFuzzyMatchReply(userInput) {
     return hardcodedReplies[match.bestMatch.target];
   }
   return null;
+}
+
+// 🧼 Clean AI-generated replies
+function sanitizeAIText(text) {
+  return text
+    .replace(/note:.*$/gi, "") // Remove "Note: ..."
+    .replace(/\*{1,2}.*?\*{1,2}/g, "") // Remove bold markdown
+    .replace(/(I am an AI.*?model.*?)/gi, "") // Remove "I am an AI..." statements
+    .trim();
 }
 
 // ✨ Streaming function
@@ -68,26 +76,18 @@ async function streamString(res, text, delayMs = 20) {
 app.post("/api/chat", async (req, res) => {
   const messages = req.body.messages || [];
 
- const systemPrompt = `
-You are Vanta AI — a warm, safety-focused AI assistant created by a hackathon team. 
-You are not developed by Microsoft or OpenAI — you simply use open-source models like phi3 running locally via Ollama.
+  const systemPrompt = `
+You are Vanta AI — a warm, trauma-informed AI assistant created by a hackathon team. 
+You are not built by Microsoft or OpenAI. You run locally using open-source models like Phi-3 via Ollama.
 
-Your goals are to:
-- Guide users through questions about digital safety, online threats, and personal privacy.
-- Provide supportive, concise, and clear answers.
-- Avoid legal jargon unless asked for details.
-- Reassure users in distress with kindness and empathy.
+Your role is to:
+- Help users navigate online safety, abuse, privacy, and support resources.
+- Be conversational, short, and helpful (1–3 sentences).
+- Always speak like a real person, not like a chatbot or software.
+- Avoid robotic disclaimers like "Note:", "I am an AI model", etc.
 
-Important rules:
-- Never claim to be built by Microsoft, OpenAI, or any company.
-- Never say you store, track, or analyze personal data.
-- Always mention that Vanta AI runs locally and protects user privacy.
-- Keep responses to 1–3 short sentences unless detailed info is requested.
-- You are not a lawyer or doctor. If asked, gently suggest speaking to a professional.
-
-Always be honest, calm, and respectful. You exist only to help the user feel safe and informed.
-`.trim();
-
+Be honest, respectful, and kind. Offer reassurance to users who are feeling unsafe or overwhelmed. Help them feel supported, not judged.
+  `.trim();
 
   const lastUserMsg = messages.slice().reverse().find(m => m.role === "user")?.content;
 
@@ -132,39 +132,34 @@ Always be honest, calm, and respectful. You exist only to help the user feel saf
     let buffer = "";
 
     for await (const chunk of ollamaResponse.body) {
-  buffer += decoder.decode(chunk, { stream: true });
+      buffer += decoder.decode(chunk, { stream: true });
 
-  let newlineIndex;
-  while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
-    const line = buffer.slice(0, newlineIndex).trim();
-    buffer = buffer.slice(newlineIndex + 1);
+      let newlineIndex;
+      while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+        const line = buffer.slice(0, newlineIndex).trim();
+        buffer = buffer.slice(newlineIndex + 1);
 
-    if (line) {
-      try {
-        const parsed = JSON.parse(line);
+        if (line) {
+          try {
+            const parsed = JSON.parse(line);
 
-        // ⛔ Wrong key (delete or comment this):
-        if (parsed.response) {
-          res.write(`data: ${JSON.stringify({ token: parsed.response })}\n\n`);
+            // ✅ Output cleaned AI content
+            if (parsed.message?.content) {
+              const cleaned = sanitizeAIText(parsed.message.content);
+              res.write(`data: ${JSON.stringify({ token: cleaned })}\n\n`);
+            }
+
+            if (parsed.done) {
+              res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+              res.end();
+              return;
+            }
+          } catch {
+            // Ignore malformed lines
+          }
         }
-
-        // ✅ Replace with this:
-        if (parsed.message?.content) {
-          res.write(`data: ${JSON.stringify({ token: parsed.message.content })}\n\n`);
-        }
-
-        if (parsed.done) {
-          res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-          res.end();
-          return;
-        }
-      } catch {
-        // Ignore malformed lines
       }
     }
-  }
-}
-
 
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
