@@ -54,7 +54,6 @@ const LegalChatInterface = () => {
 
   return (
     <div style={styles.container}>
-      {/* Navigation Tabs */}
       <div style={styles.tabsWrapper}>
         <button
           style={styles.tabButton(activeTab === 'chat')}
@@ -70,13 +69,11 @@ const LegalChatInterface = () => {
         </button>
       </div>
 
-      {/* Main Content */}
       <div style={styles.contentBox}>
         {activeTab === 'chat' && <LegalChatbot />}
         {activeTab === 'fir' && <FIRGenerator />}
       </div>
 
-      {/* Footer */}
       <footer style={styles.footer}>
         <p>© 2025 LegalAI - Powered by AI for Indian Legal Assistance</p>
         <p style={styles.footerNote}>

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// Watermark Utility Functions
 const WatermarkUtil = {
   generateWatermarkId: () => {
     return `wm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -101,12 +100,9 @@ const WatermarkUtil = {
     });
   },
 
-  // Mock function to simulate tracking watermarked images across the internet
   trackImageUsage: async (watermarkId) => {
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Mock data for demonstration
     const mockUsageData = [
       {
         id: 1,
@@ -146,7 +142,6 @@ const WatermarkUtil = {
   }
 };
 
-// Main App Component
 const DigitalWatermarking = () => {
   const [currentView, setCurrentView] = useState('upload');
   const [originalImage, setOriginalImage] = useState(null);

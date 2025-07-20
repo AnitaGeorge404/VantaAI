@@ -21,7 +21,6 @@ function BottomNav() {
 
         return (
           <Link key={item.path} to={item.path} style={styles.navItemLink}>
-            {/* This inner div receives the pill background style when active */}
             <div style={isActive ? styles.activePill : styles.inactivePill}>
               <IconComponent
                 size={22}
@@ -39,9 +38,7 @@ function BottomNav() {
   );
 }
 
-// --- Styles to perfectly match the user's image ---
 const styles = {
-  // Full-width container with a beautiful glass effect
   navContainer: {
     position: 'fixed',
     bottom: 0,
@@ -49,16 +46,12 @@ const styles = {
     right: 0,
     height: '80px',
     display: 'flex',
-    // --- The Glass Effect ---
-    backgroundColor: 'rgba(242, 240, 255, 0.75)', // Light lavender semi-transparent
+    backgroundColor: 'rgba(242, 240, 255, 0.75)', 
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
-    // ---
     borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-    // Padding at the bottom for iPhone home bar
     paddingBottom: 'env(safe-area-inset-bottom)',
   },
-  // The Link element, which centers the pill
   navItemLink: {
     flex: 1,
     display: 'flex',
@@ -67,11 +60,9 @@ const styles = {
     textDecoration: 'none',
     height: '100%',
   },
-  // Consistent color for all icons
   iconColor: {
-    color: '#4C2A85', // Dark purple from your image
+    color: '#4C2A85', 
   },
-  // Base style for the wrapper div (inactive)
   inactivePill: {
     display: 'flex',
     flexDirection: 'column',
@@ -82,7 +73,6 @@ const styles = {
     borderRadius: '16px',
     backgroundColor: 'transparent',
   },
-  // Style for the active item, creating the light purple pill
   activePill: {
     display: 'flex',
     flexDirection: 'column',
@@ -91,7 +81,7 @@ const styles = {
     gap: '4px',
     padding: '8px 12px',
     borderRadius: '16px',
-    backgroundColor: '#EBEBFF', // The light purple pill color from your image
+    backgroundColor: '#EBEBFF', 
     transition: 'background-color 0.3s ease',
   },
   inactiveLabel: {
@@ -103,7 +93,7 @@ const styles = {
   activeLabel: {
     fontFamily: "'Lora', serif",
     fontSize: '12px',
-    fontWeight: '700', // Bolder font for the active item
+    fontWeight: '700', 
     color: '#4C2A85',
   },
 };

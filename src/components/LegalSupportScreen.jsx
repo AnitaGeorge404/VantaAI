@@ -43,7 +43,7 @@ function LegalSupportScreen() {
     <>
       <div style={styles.container}>
         <header style={styles.header}>
-          <h1 style={{...styles.title, color: '#3949ab'}}>⚖️ Legal Support</h1>
+          <h1 style={{...styles.title, color: '#3949ab'}}>Legal Support</h1>
         </header>
         <p style={styles.subtext}>Access legal resources and expert guidance.</p>
 

@@ -21,16 +21,15 @@ function PreventScreen() {
   ];
 
   const cardSchemes = [
-    
+     {
+      bgColor: '#EFF6FF',
+      iconColor: '#3B82F6',
+      titleColor: '#1E3A8A',
+    },
     {
       bgColor: '#FEF2F2',
       iconColor: '#F43F5E',
       titleColor: '#881337',
-    },
-    {
-      bgColor: '#EFF6FF',
-      iconColor: '#3B82F6',
-      titleColor: '#1E3A8A',
     }
   ];
 
@@ -38,7 +37,7 @@ function PreventScreen() {
     <>
       <div style={styles.container}>
         <header style={styles.header}>
-          <h1 style={{...styles.title, color: '#6D28D9'}}>Protect Yourself</h1>
+          <h1 style={{...styles.title, color: '#3949ab'}}>Protect Yourself</h1>
         </header>
         <p style={styles.subtext}>Stay ahead. Use tools to prevent misuse before it begins.</p>
 

@@ -10,7 +10,6 @@ const styles = {
     padding: '20px',
     background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
     fontFamily: "'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif",
-    // --- FIX: Prevents padding from causing horizontal overflow ---
     boxSizing: 'border-box',
   },
   container: {

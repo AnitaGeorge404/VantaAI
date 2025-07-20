@@ -140,7 +140,7 @@ const styles = {
     fontSize: '24px',
     fontWeight: '700',
     fontFamily: "'Lora', serif",
-    color: '#6D28D9',
+    color: '#3949ab',
   },
   profileChip: {
     display: 'flex',

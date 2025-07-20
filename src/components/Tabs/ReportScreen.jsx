@@ -1,21 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import BottomNav from './BottomNav';
-import { FileSignature, Mail } from 'lucide-react'; 
+import { FileSignature, Mail, ShieldOff } from 'lucide-react';
 
 function ReportScreen() {
   const cardData = [
     {
       title: 'One-Click Legal Complaints',
       description: 'Quickly file abuse reports with prefilled legal forms.',
-      icon: FileSignature, 
+      icon: FileSignature,
       path: '/LegalComplaints',
     },
     {
       title: 'Automated Takedown Requests',
       description: 'Instantly send DMCA/complaints to platforms.',
-      icon: Mail, 
+      icon: Mail,
       path: '/TakeDownRequests',
+    },
+    {
+      title: 'Report Anonymously',
+      description: 'Submit reports without revealing your identity.',
+      icon: ShieldOff,
+      path: '/anonymous',
     },
   ];
 
@@ -36,14 +42,14 @@ function ReportScreen() {
     <>
       <div style={styles.container}>
         <header style={styles.header}>
-          <h1 style={{...styles.title, color: '#D97706'}}>Report</h1>
+          <h1 style={{...styles.title, color: '#3949ab'}}>Report</h1>
         </header>
         <p style={styles.subtext}>Take action against abuse with quick legal tools.</p>
 
         <main style={styles.grid}>
           {cardData.map((card, index) => {
             const IconComponent = card.icon;
-            const scheme = cardSchemes[index % 2];
+            const scheme = cardSchemes[index % 2]; 
             return (
               <Link key={index} to={card.path} style={{
                 ...styles.card,
@@ -112,6 +118,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    minWidth: '140px',
   },
   iconContainer: {
     width: '40px',

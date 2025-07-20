@@ -22,7 +22,6 @@ const LegalChatbot = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  // Mock legal responses based on keywords
   const generateLegalResponse = (userMessage) => {
     const message = userMessage.toLowerCase();
     
@@ -75,7 +74,6 @@ const LegalChatbot = () => {
       };
     }
     
-    // Default response for unrecognized queries
     return {
       text: "I understand you have a legal query. While I can provide general information about Indian laws, I'd recommend consulting with a qualified lawyer for specific legal advice. You can also try rephrasing your question with more specific legal terms, or use our FIR generator if you need to file a complaint.",
       category: 'general'
@@ -96,7 +94,6 @@ const LegalChatbot = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate typing delay
     setTimeout(() => {
       const response = generateLegalResponse(inputMessage);
       const botMessage = {
@@ -137,9 +134,8 @@ const LegalChatbot = () => {
       margin: '20px auto',
       boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
     }}>
-      {/* Card Header */}
       <div style={{
-        backgroundColor: '#2563eb', // blue-600
+        backgroundColor: '#2563eb', 
         color: 'white',
         padding: '16px 20px',
         borderTopLeftRadius: '8px',
@@ -152,10 +148,10 @@ const LegalChatbot = () => {
           Legal Q&A Assistant
         </h2>
         <span style={{
-          backgroundColor: '#3b82f6', // blue-500
+          backgroundColor: '#3b82f6', 
           color: 'white',
           padding: '4px 10px',
-          borderRadius: '9999px', // full rounded
+          borderRadius: '9999px', 
           fontSize: '0.75rem',
           fontWeight: '600'
         }}>
@@ -163,7 +159,6 @@ const LegalChatbot = () => {
         </span>
       </div>
       
-      {/* Card Content - Messages Area */}
       <div style={{
         flex: 1,
         padding: '16px',
@@ -185,8 +180,8 @@ const LegalChatbot = () => {
                 maxWidth: '80%',
                 padding: '12px',
                 borderRadius: '8px',
-                backgroundColor: message.sender === 'user' ? '#2563eb' : '#f3f4f6', // blue-600 vs gray-100
-                color: message.sender === 'user' ? 'white' : '#374151', // white vs gray-800
+                backgroundColor: message.sender === 'user' ? '#2563eb' : '#f3f4f6', 
+                color: message.sender === 'user' ? 'white' : '#374151', 
               }}
             >
               <p style={{ fontSize: '0.875rem', lineHeight: '1.5' }}>{message.text}</p>
@@ -198,8 +193,8 @@ const LegalChatbot = () => {
                   fontSize: '0.75rem',
                   fontWeight: '500',
                   borderRadius: '4px',
-                  border: '1px solid #e0e0e0', // outline equivalent
-                  color: '#4b5563', // text-gray-600
+                  border: '1px solid #e0e0e0', 
+                  color: '#4b5563', 
                   backgroundColor: 'white'
                 }}>
                   {message.category.replace('_', ' ')}
@@ -226,7 +221,6 @@ const LegalChatbot = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* CSS for typing animation */}
       <style>
         {`
           @keyframes bounce {
@@ -236,11 +230,10 @@ const LegalChatbot = () => {
         `}
       </style>
 
-      {/* Quick Questions */}
       <div style={{
         padding: '16px',
         borderTop: '1px solid #e0e0e0',
-        backgroundColor: '#f9fafb' // gray-50
+        backgroundColor: '#f9fafb' 
       }}>
         <p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '8px' }}>Quick Questions:</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -251,14 +244,14 @@ const LegalChatbot = () => {
               style={{
                 padding: '8px 12px',
                 borderRadius: '6px',
-                border: '1px solid #d1d5db', // outline equivalent
+                border: '1px solid #d1d5db', 
                 backgroundColor: 'white',
-                color: '#374151', // text-gray-800
+                color: '#374151', 
                 fontSize: '0.75rem',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s ease',
                 ':hover': {
-                  backgroundColor: '#f3f4f6' // hover:bg-gray-100
+                  backgroundColor: '#f3f4f6' 
                 }
               }}
             >
@@ -268,7 +261,6 @@ const LegalChatbot = () => {
         </div>
       </div>
 
-      {/* Input Area */}
       <div style={{
         padding: '16px',
         borderTop: '1px solid #e0e0e0'
@@ -288,7 +280,7 @@ const LegalChatbot = () => {
               outline: 'none',
               fontSize: '1rem',
               color: '#374151',
-              backgroundColor: isTyping ? '#f3f4f6' : 'white', // disabled style
+              backgroundColor: isTyping ? '#f3f4f6' : 'white', 
               cursor: isTyping ? 'not-allowed' : 'text'
             }}
             disabled={isTyping}
@@ -299,13 +291,13 @@ const LegalChatbot = () => {
             style={{
               padding: '10px 20px',
               borderRadius: '6px',
-              backgroundColor: (!inputMessage.trim() || isTyping) ? '#93c5fd' : '#2563eb', // blue-300 vs blue-600
+              backgroundColor: (!inputMessage.trim() || isTyping) ? '#93c5fd' : '#2563eb', 
               color: 'white',
               border: 'none',
               cursor: (!inputMessage.trim() || isTyping) ? 'not-allowed' : 'pointer',
               transition: 'background-color 0.2s ease',
               ':hover': {
-                backgroundColor: (!inputMessage.trim() || isTyping) ? '' : '#1d4ed8' // blue-700
+                backgroundColor: (!inputMessage.trim() || isTyping) ? '' : '#1d4ed8' 
               }
             }}
           >

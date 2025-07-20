@@ -7,13 +7,13 @@ function SupportScreen() {
   const cardData = [
     {
       title: 'Chatbot',
-      description: 'Chat confidentially with a certified mental health professional.',
+      description: 'An emotional chatbot designed to understand and respond to human feelings with empathy',
       icon: MessageSquareText, 
       path: '/emotionalsupport',
     },
     {
-      title: 'Mental Health',
-      description: 'Explore articles and tools to support your mental health.',
+      title: 'Community Support',
+      description: 'A community support feature that provides access to various trusted platforms',
       icon: BrainCircuit, 
       path: '/mentalhealth',
     },
@@ -36,7 +36,7 @@ function SupportScreen() {
     <>
       <div style={styles.container}>
         <header style={styles.header}>
-          <h1 style={{...styles.title, color: '#D81B60'}}>Emotional Support</h1>
+          <h1 style={{...styles.title, color: '#3949ab'}}>Emotional Support</h1>
         </header>
         <p style={styles.subtext}>Your well-being matters. Help is always available.</p>
 

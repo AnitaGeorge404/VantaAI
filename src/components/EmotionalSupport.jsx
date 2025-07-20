@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-// --- FIX: Corrected icon name from 'HeartHand' to 'HandHeart' ---
 import { Send, Sparkles, Shield, Scale, HandHeart, RefreshCcw } from 'lucide-react';
 
-// --- Mock Child Components (for structure) ---
 const ChatWindow = ({ messages, isTyping, messagesEndRef }) => (
   <div style={styles.chatWindow}>
     {messages.map((msg, index) => (
@@ -89,7 +87,6 @@ function EmotionalSupport() {
   const suggestionGroups = [
     { title: "Safety & Prevention", icon: <Shield size={18}/>, items: [ "How do I know if my personal data is being misused?", "Can someone post my pictures without asking me?", "What should I do if someone threatens me online?", ], },
     { title: "Legal Rights", icon: <Scale size={18}/>, items: [ "Do I have the right to ask for content takedown?", "Can I take action if my pictures are used without consent?", ], },
-    // --- FIX: Using the correct icon component 'HandHeart' ---
     { title: "Mental Health & Support", icon: <HandHeart size={18}/>, items: [ "I feel overwhelmed, what can I do right now?", "I’m scared to speak up, what are my options?", ], },
   ];
 
@@ -199,7 +196,6 @@ function EmotionalSupport() {
 }
 
 
-// --- STYLES OBJECT ---
 const styles = {
   page: {
     display: 'flex',
@@ -292,7 +288,6 @@ const styles = {
     cursor: 'pointer',
     transition: 'background-color 0.2s',
   },
-  // --- Suggestions Styles ---
   suggestionsContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -328,7 +323,6 @@ const styles = {
     color: '#43016E',
     transition: 'background-color 0.2s, transform 0.1s',
   },
-  // --- ChatWindow Styles ---
   chatWindow: {
     display: 'flex',
     flexDirection: 'column',

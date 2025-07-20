@@ -20,7 +20,7 @@ function InAppWarnings() {
     const reader = new FileReader();
     reader.onload = async (event) => {
       const content = event.target.result;
-      const result = await analyzeContentTrust(content); // ✅ await here
+      const result = await analyzeContentTrust(content); 
       setTrustScore(result.score);
       if (result.isSuspicious) setShowPopup(true);
     };
@@ -29,7 +29,7 @@ function InAppWarnings() {
 
   const handleCheckLink = async () => {
     const normalized = linkText.startsWith("http") ? linkText : `https://${linkText}`;
-    const result = await analyzeContentTrust(normalized); // ✅ await here
+    const result = await analyzeContentTrust(normalized); 
     console.log("Checking:", normalized, "Result:", result);
     setTrustScore(result.score);
     if (result.isSuspicious) setShowPopup(true);

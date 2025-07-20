@@ -15,7 +15,6 @@ import {
 const filterOptions = ["All", "Lawyer", "NGO", "Government"];
 
 function LawyerDirectory() {
-  // --- CHANGE: The first item (index 0) will now be open by default ---
   const [openIndex, setOpenIndex] = useState(0);
   const [searchText, setSearchText] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");

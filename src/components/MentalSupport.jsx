@@ -23,7 +23,7 @@ function MentalSupport() {
   style={{
     minHeight: "100vh",
     width: "100%",
-    boxSizing: "border-box", // ✅ ensures padding doesn't overflow
+    boxSizing: "border-box", 
     background: "linear-gradient(to bottom, #C2E8FF, #DEE6FF, #E5C8FF)",
     fontFamily: "Inter, sans-serif",
     color: "#43016E",
@@ -31,7 +31,7 @@ function MentalSupport() {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    overflow: "hidden", // ✅ safety
+    overflow: "hidden", 
   }}
 >
 

@@ -1,22 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import legalTips from "../data/legalTips";
-import { ShieldCheck, ChevronDown } from 'lucide-react'; // Using icons consistent with the new design
+import { ShieldCheck, ChevronDown } from 'lucide-react'; 
 
 function LegalTips() {
   const navigate = useNavigate();
-  // State to manage which accordion category is open. Defaults to the first one.
   const [openCategory, setOpenCategory] = useState(legalTips.categories[0]?.category);
 
   const handleToggle = (categoryTitle) => {
-    // If the clicked category is already open, close it. Otherwise, open it.
     setOpenCategory(prevOpen => prevOpen === categoryTitle ? null : categoryTitle);
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.contentWrapper}>
-        {/* Header Section */}
         <div style={styles.header}>
           <h1 style={styles.mainTitle}>{legalTips.title}</h1>
           <button onClick={() => navigate(-1)} style={styles.backButton}>
@@ -24,10 +21,8 @@ function LegalTips() {
           </button>
         </div>
 
-        {/* Description */}
         <p style={styles.introText}>{legalTips.description}</p>
 
-        {/* Accordion Layout */}
         <div style={styles.accordion}>
           {legalTips.categories.map((cat) => {
             const isOpen = openCategory === cat.category;
@@ -63,7 +58,6 @@ function LegalTips() {
   );
 }
 
-// Styles adapted from the clean 'RightsDetail' component design
 const styles = {
     container: {
         minHeight: '100vh',
@@ -85,7 +79,7 @@ const styles = {
         fontSize: 'clamp(32px, 5vw, 40px)',
         fontWeight: '700',
         fontFamily: "'Lora', serif",
-        color: '#4C1D95', // The requested dark purple
+        color: '#4C1D95', 
         margin: 0,
     },
     backButton: {

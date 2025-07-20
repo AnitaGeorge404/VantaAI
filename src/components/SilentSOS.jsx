@@ -190,7 +190,6 @@ const SilentSOS = () => {
           </div>
         ))}
       </div>
-      {/* The visible evidence review section and button have been removed */}
     </div>
   );
 };

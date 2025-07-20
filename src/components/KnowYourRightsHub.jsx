@@ -7,7 +7,6 @@ import {
   Megaphone
 } from 'lucide-react';
 
-// Data for the rights sections
 const rightsData = [
   {
     title: "Laws & Rights",
@@ -35,7 +34,6 @@ const rightsData = [
   },
 ];
 
-// Alternating color schemes
 const cardSchemes = [
   { bgColor: '#EFF6FF', iconColor: '#3B82F6', titleColor: '#1E3A8A' },
   { bgColor: '#FEF2F2', iconColor: '#F43F5E', titleColor: '#881337' }
@@ -118,7 +116,6 @@ const styles = {
     fontSize: '14px',
     color: '#555',
     marginBottom: '20px',
-    // --- THIS LINE IS NOW FIXED ---
     fontFamily: "'Inter', sans-serif", 
     flexShrink: 0,
   },
