@@ -1,165 +1,198 @@
-// src/components/SilentSOS.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 
-const SilentSOS = () => {
-  // State for the recording trigger
-  const [recordClickCount, setRecordClickCount] = useState(0);
-  const recordClickTimerRef = useRef(null);
-  
-  // State for the upload trigger
-  const [uploadClickCount, setUploadClickCount] = useState(0);
-  const uploadClickTimerRef = useRef(null);
+const blobToBase64 = (blob) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result;
+      if (!result) return reject('Empty reader result');
+      const base64 = result.split(',')[1];
+      base64 ? resolve(base64) : reject('Base64 split failed');
+    };
+    reader.onerror = (err) => reject('FileReader error: ' + err.message);
+    reader.readAsDataURL(blob);
+  });
 
-  // State to secretly hold the recorded files (blobs)
-  const [recordedBlobs, setRecordedBlobs] = useState({});
-  const [isRecording, setIsRecording] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+const SilentSOS = () => {
+  const [clickCount, setClickCount] = useState(0);
+  // **NEW**: State and Ref for the new temperature click trigger
+  const [tempClickCount, setTempClickCount] = useState(0);
+  const clickTimerRef = useRef(null);
+  const tempClickTimerRef = useRef(null);
+
 
   const weather = {
-    location: 'Kollam, Kerala',
-    temperature: 28,
-    condition: 'Heavy Rain & Thunder',
-    humidity: 88,
-    windSpeed: 18,
+    location: 'New York, NY',
+    temperature: 72,
+    condition: 'Partly Cloudy',
+    humidity: 65,
+    windSpeed: 8,
     forecast: [
-      { day: 'Today', high: 29, low: 25, condition: 'Rainy' },
-      { day: 'Tomorrow', high: 29, low: 25, condition: 'Showers' },
-      { day: 'Saturday', high: 30, low: 26, condition: 'Cloudy' }
+      { day: 'Today', high: 75, low: 62, condition: 'Sunny' },
+      { day: 'Tomorrow', high: 78, low: 65, condition: 'Cloudy' },
+      { day: 'Wednesday', high: 73, low: 60, condition: 'Rainy' }
     ]
   };
 
-  // --- HIDDEN TRIGGER 1: START RECORDING ---
-  const handleRecordTrigger = () => {
-    setRecordClickCount((prev) => prev + 1);
-    clearTimeout(recordClickTimerRef.current);
-    recordClickTimerRef.current = setTimeout(() => setRecordClickCount(0), 2000); // 2-second window
-
-    if (recordClickCount + 1 >= 3) {
+  const handleCloudClick = () => {
+    setClickCount((prev) => prev + 1);
+    clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = setTimeout(() => setClickCount(0), 3000);
+    if (clickCount + 1 >= 3) {
       triggerSOS();
-      setRecordClickCount(0); // Reset immediately
+      setClickCount(0);
+    }
+  };
+  
+  const handleTempClick = () => {
+    setTempClickCount((prev) => prev + 1);
+    clearTimeout(tempClickTimerRef.current);
+    tempClickTimerRef.current = setTimeout(() => setTempClickCount(0), 3000); 
+
+    if (tempClickCount + 1 >= 5) {
+      console.log('Download triggered by temperature click.');
+      handleDownloadAllEvidence();
+      setTempClickCount(0); 
     }
   };
 
-  // --- HIDDEN TRIGGER 2: UPLOAD & GET LINKS ---
-  const handleUploadTrigger = () => {
-    setUploadClickCount((prev) => prev + 1);
-    clearTimeout(uploadClickTimerRef.current);
-    uploadClickTimerRef.current = setTimeout(() => setUploadClickCount(0), 2000); // 2-second window
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+        e.preventDefault(); 
+        triggerSOS();
+      }
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault(); 
+        console.log('Download triggered by keyboard shortcut.');
+        handleDownloadAllEvidence();
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []); 
 
-    if (uploadClickCount + 1 >= 3) {
-      handleUploadAndGetLinks();
-      setUploadClickCount(0); // Reset immediately
+  const triggerSOS = async () => {
+    console.log('🔴 SOS Triggered');
+    const recordingPromises = [
+      recordMedia({ video: true, audio: true }, 'video', 10000),
+      recordMedia({ audio: true }, 'audio', 10000),
+    ];
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+      recordingPromises.push(recordScreenRecording(10000));
+    } else {
+      console.warn('Screen recording not supported on this device/browser.');
+      alert('Screen recording not supported on this device.');
     }
+
+    await Promise.all(recordingPromises);
+    alert('Evidence recording complete and saved locally.');
   };
 
-  const recordAndStoreBlob = async (constraints, type, duration) => {
+  const recordMedia = async (constraints, type, duration = 10000) => {
     try {
-      const stream = await (type === 'screen' 
-        ? navigator.mediaDevices.getDisplayMedia(constraints) 
-        : navigator.mediaDevices.getUserMedia(constraints));
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (!stream || stream.getTracks().length === 0) {
+        console.warn(`🚫 No ${type} stream available.`);
+        return;
+      }
+      const mimeType = type === 'audio' ? 'audio/webm;codecs=opus' : 'video/webm;codecs=vp8,opus';
+      const recorder = new MediaRecorder(stream, { mimeType });
+      const chunks = [];
+      recorder.ondataavailable = (e) => e.data.size > 0 && chunks.push(e.data);
+      recorder.onstop = async () => {
+        if (chunks.length === 0) {
+          console.warn(`⚠️ No chunks captured for ${type}`);
+        } else {
+          const blob = new Blob(chunks, { type: mimeType });
+          try {
+            const base64 = await blobToBase64(blob);
+            localStorage.setItem(`evidence_${type}`, JSON.stringify({ base64 }));
+            console.log(`✅ ${type} saved successfully`);
+          } catch (err) {
+            console.error(`❌ Failed to convert ${type} to base64:`, err);
+          }
+        }
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      recorder.start();
+      setTimeout(() => recorder.state === 'recording' && recorder.stop(), Math.max(duration, 5000));
+    } catch (err) {
+      console.error(`❌ Failed to record ${type}:`, err.message);
+      alert(`Access denied for ${type}. Please allow camera/microphone permissions in your browser settings.`);
+    }
+  };
 
-      if (!stream) return false;
-
+  const recordScreenRecording = async (duration = 10000) => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: 'screen' }, audio: true });
       const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8,opus' });
       const chunks = [];
       recorder.ondataavailable = (e) => e.data.size > 0 && chunks.push(e.data);
-      
-      const recordPromise = new Promise((resolve) => {
-        recorder.onstop = () => {
-          stream.getTracks().forEach((t) => t.stop());
-          if (chunks.length > 0) {
-            const blob = new Blob(chunks, { type: recorder.mimeType });
-            setRecordedBlobs(prev => ({ ...prev, [type]: blob }));
-            resolve(true);
-          } else {
-            resolve(false);
+      recorder.onstop = async () => {
+        if (chunks.length === 0) {
+          console.warn(`⚠️ No chunks captured for screen`);
+        } else {
+          const blob = new Blob(chunks, { type: 'video/webm' });
+          try {
+            const base64 = await blobToBase64(blob);
+            localStorage.setItem(`evidence_screen`, JSON.stringify({ base64 }));
+            console.log('✅ Screen recording saved');
+          } catch (err) {
+            console.error('❌ Screen base64 conversion failed:', err);
           }
-        };
-      });
-      
+        }
+        stream.getTracks().forEach((t) => t.stop());
+      };
       recorder.start();
       setTimeout(() => recorder.state === 'recording' && recorder.stop(), duration);
-      return recordPromise;
-
     } catch (err) {
-      console.error(`❌ FAILED TO START RECORDING FOR: ${type}. Reason:`, err.message);
-      return false;
+      console.error('❌ Screen recording error:', err.message);
     }
   };
 
-  const triggerSOS = async () => {
-    if (isRecording) return;
+  const handleDownloadAllEvidence = () => {
+    let downloadedCount = 0;
+    const types = ['video', 'audio', 'screen'];
     
-    setRecordedBlobs({}); // Clear any previous recordings
-    setIsRecording(true);
-    console.log('🔴 SOS Triggered: Starting recordings...');
-    alert('Starting background recording for 10 seconds...');
+    types.forEach(type => {
+      if (localStorage.getItem(`evidence_${type}`)) {
+        downloadEvidence(type);
+        downloadedCount++;
+      }
+    });
 
-    const recordingPromises = [
-      recordAndStoreBlob({ video: true, audio: true }, 'video', 10000),
-      recordAndStoreBlob({ audio: true }, 'audio', 10000),
-      ...(navigator.mediaDevices?.getDisplayMedia ? [recordAndStoreBlob({ video: { mediaSource: 'screen' }, audio: true }, 'screen', 10000)] : [])
-    ];
-
-    const results = await Promise.all(recordingPromises);
-    setIsRecording(false);
-    
-    if (results.some(res => res === true)) {
-      alert('Recording Complete. Evidence is ready for upload.');
-    } else {
-      alert('Recording Failed. No devices could be recorded.');
-      setRecordedBlobs({}); // Clear failed attempt
+    if (downloadedCount === 0) {
+      alert('No evidence has been recorded yet. Trigger the SOS first.');
     }
   };
 
-  const handleUploadAndGetLinks = async () => {
-    if (Object.keys(recordedBlobs).length === 0) {
-      return alert('No evidence has been recorded yet. Click the weather icon 3 times to start a recording.');
+  const downloadEvidence = (type) => {
+    try {
+      const item = localStorage.getItem(`evidence_${type}`);
+      if (!item) return;
+      const { base64 } = JSON.parse(item);
+      if (!base64) throw new Error('Missing base64 data in storage');
+      const mimeType = type === 'audio' ? 'audio/webm' : 'video/webm';
+      const url = `data:${mimeType};base64,${base64}`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${type}_evidence_${Date.now()}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error(`Download error for ${type}:`, err);
+      alert(`Could not download ${type} evidence: ${err.message}`);
     }
-    if (isUploading) return;
-    
-    setIsUploading(true);
-    alert('Uploading evidence...');
-    const uploadPromises = [];
-
-    for (const [type, blob] of Object.entries(recordedBlobs)) {
-        const formData = new FormData();
-        const fileName = `${type}-${Date.now()}.webm`;
-        formData.append('file', blob, fileName);
-        
-        const uploadPromise = fetch('https://file.io', { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(result => result.success ? result.link : null)
-            .catch(err => {
-                console.error(`Upload error for ${type}:`, err);
-                return null;
-            });
-        uploadPromises.push(uploadPromise);
-    }
-    
-    const links = await Promise.all(uploadPromises);
-    const successfulLinks = links.filter(link => link !== null);
-
-    if (successfulLinks.length > 0) {
-      alert(
-        'Evidence Uploaded!\n\n' + 
-        'Copy these temporary links now:\n\n' + 
-        successfulLinks.join('\n')
-      );
-    } else {
-      alert('Upload failed. Please check your network connection.');
-    }
-
-    setIsUploading(false);
-    setRecordedBlobs({}); // Clear recordings after attempting upload
   };
 
   const getIcon = (cond) => {
     const c = cond.toLowerCase();
-    if (c.includes('sun') || c.includes('clear')) return '☀️';
+    if (c.includes('sun')) return '☀️';
     if (c.includes('cloud')) return '⛅';
-    if (c.includes('rain') || c.includes('storm') || c.includes('showers')) return '🌧️';
+    if (c.includes('rain')) return '🌧️';
     return '☁️';
   };
 
@@ -169,19 +202,18 @@ const SilentSOS = () => {
         <h2>WeatherNow</h2>
         <div>{weather.location}</div>
       </div>
+
       <div style={styles.main}>
         <div style={styles.temperature}>
-          {/* This is now the UPLOAD trigger */}
-          <span onClick={handleUploadTrigger} style={styles.tempText} title="Click 3 times to upload evidence">
-            {weather.temperature}°C
+          <span onClick={handleTempClick} style={styles.tempText} title="Click 5 times to download evidence">
+            {weather.temperature}°
           </span>
-          {/* This is now the RECORD trigger */}
-          <span onClick={handleRecordTrigger} style={styles.icon} title="Click 3 times to record evidence">
+          <span onClick={handleCloudClick} style={styles.icon} title="Click 3 times for SOS">
             {getIcon(weather.condition)}
           </span>
         </div>
         <div>{weather.condition}</div>
-        <div>Humidity: {weather.humidity}% | Wind: {weather.windSpeed} km/h</div>
+        <div>Humidity: {weather.humidity}% | Wind: {weather.windSpeed} mph</div>
         <h4 style={styles.forecastHeader}>Forecast</h4>
         {weather.forecast.map((f, i) => (
           <div key={i} style={styles.forecastItem}>
@@ -195,14 +227,61 @@ const SilentSOS = () => {
 };
 
 const styles = {
-  container: { maxWidth: 400, margin: '0 auto', padding: 20, fontFamily: 'Arial, sans-serif', background: 'linear-gradient(to bottom, #2c3e50, #3498db)', color: 'white', borderRadius: 15, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', minHeight: 'calc(100vh - 40px)', display: 'flex', flexDirection: 'column' },
+  container: {
+    maxWidth: 400,
+    margin: '0 auto',
+    padding: 20,
+    fontFamily: 'Arial, sans-serif',
+    background: 'linear-gradient(to bottom, #74b9ff, #0984e3)',
+    color: 'white',
+    borderRadius: 15,
+    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+    minHeight: 'calc(100vh - 40px)',
+    display: 'flex',
+    flexDirection: 'column'
+  },
   header: { textAlign: 'center', marginBottom: 20 },
-  main: { background: 'rgba(255,255,255,0.1)', borderRadius: 15, padding: 20, flexGrow: 1 },
-  temperature: { fontSize: 48, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 },
-  tempText: { fontWeight: 300, cursor: 'pointer', userSelect: 'none' },
-  icon: { fontSize: 40, cursor: 'pointer', userSelect: 'none' },
+  main: {
+    background: 'rgba(255,255,255,0.1)',
+    borderRadius: 15,
+    padding: 20,
+    flexGrow: 1,
+  },
+  temperature: {
+    fontSize: 48,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  tempText: {
+    fontWeight: 300,
+    cursor: 'pointer',
+    userSelect: 'none',
+  },
+  icon: {
+    fontSize: 40,
+    cursor: 'pointer',
+    userSelect: 'none',
+  },
   forecastHeader: { marginTop: 20, marginBottom: 10 },
-  forecastItem: { display: 'flex', justifyContent: 'space-between', padding: '5px 0' },
+  forecastItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '5px 0',
+  },
+  downloadSection: { marginTop: 20, textAlign: 'center' },
+  button: {
+    padding: '12px 20px',
+    background: '#fff',
+    color: '#0984e3',
+    border: 'none',
+    borderRadius: 8,
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+  },
 };
 
 export default SilentSOS;
