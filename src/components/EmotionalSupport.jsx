@@ -170,7 +170,7 @@ function EmotionalSupport() {
       <div style={styles.chatContainer}>
         <header style={styles.header}>
           <div style={styles.headerTitle}>
-            <Sparkles size={24} style={{ color: '#7B68EE' }} />
+            <Sparkles size={24} style={{ color: '#6A5ACD' }} />
             <h1 style={{ margin: '0', fontSize: '20px' }}>Vanta AI Support</h1>
           </div>
           <button onClick={handleNewChat} style={styles.newChatButton}>
@@ -260,7 +260,6 @@ const styles = {
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     flexShrink: 0,
   },
-  // --- InputBar Styles ---
   inputBarContainer: {
     display: 'flex',
     alignItems: 'center',
@@ -274,6 +273,8 @@ const styles = {
     fontSize: '16px',
     background: '#fff',
     outline: 'none',
+    // MODIFIED: Added color property to make the typing text purple
+    color: '#43016E',
   },
   sendButton: {
     display: 'flex',
@@ -339,7 +340,7 @@ const styles = {
     color: 'white',
     fontSize: '12px',
     fontWeight: 'bold',
-    background: role === 'user' ? '#7B68EE' : '#A9A9A9',
+    background: role === 'user' ? '#6A5ACD' : '#A9A9A9',
   }),
   userMessageContainer: {
     display: 'flex',
@@ -356,7 +357,7 @@ const styles = {
     maxWidth: '80%',
   },
   userMessage: {
-    background: '#7B68EE',
+    background: '#6A5ACD',
     color: 'white',
     padding: '12px 16px',
     borderRadius: '18px 18px 4px 18px',
