@@ -15,7 +15,6 @@ const blobToBase64 = (blob) =>
 
 const SilentSOS = () => {
   const [clickCount, setClickCount] = useState(0);
-  // **NEW**: State and Ref for the new temperature click trigger
   const [tempClickCount, setTempClickCount] = useState(0);
   const clickTimerRef = useRef(null);
   const tempClickTimerRef = useRef(null);
