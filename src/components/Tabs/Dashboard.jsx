@@ -31,11 +31,11 @@ function Dashboard() {
       icon: Send,
       path: '/report',
     },
-    {
-      title: 'Scan & Detect',
-      description: 'Identify unauthorized use of your images & videos.',
-      icon: Search,
-      path: '/detect',
+   {
+      title: 'Legal Support',
+      description: 'Expert guidance for digital rights violations.',
+      icon: Scale,
+      path: '/legal',
     },
     {
       title: 'Emotional Support',
@@ -44,22 +44,10 @@ function Dashboard() {
       path: '/support',
     },
     {
-      title: 'Silent SOS',
-      description: 'Discreet alerts for immediate assistance in a crisis.',
-      icon: AlertTriangle,
-      path: '/sos',
-    },
-    {
       title: 'AI Harassment Detector',
       description: 'Identifies & flags potential harassment patterns.',
       icon: Bot,
       path: '/harassment',
-    },
-    {
-      title: 'Legal Support',
-      description: 'Expert guidance for digital rights violations.',
-      icon: Scale,
-      path: '/legal',
     },
     {
       title: 'Anonymous Reporting',
@@ -67,6 +55,19 @@ function Dashboard() {
       icon: UserX,
       path: '/anonymous',
     },
+    {
+      title: 'Silent SOS',
+      description: 'Discreet alerts for immediate assistance in a crisis.',
+      icon: AlertTriangle,
+      path: '/sos',
+    },
+    {
+      title: 'Scan & Detect',
+      description: 'Identify unauthorized use of your images & videos.',
+      icon: Search,
+      path: '/detect',
+    },
+    
   ];
 
   const cardSchemes = [
