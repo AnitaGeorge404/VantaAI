@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import stringSimilarity from "string-similarity";
 
 dotenv.config();
+const IS_OLLAMA_ENABLED = process.env.OLLAMA_MODE === "local";
+
 
 const app = express();
 app.use(cors());
@@ -71,9 +73,18 @@ async function streamString(res, text, delayMs = 20) {
   res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
   res.end();
 }
+app.get("/", (req, res) => {
+  res.send("✅ Vanta AI backend is live.");
+});
 
 // 🔄 Chat endpoint
 app.post("/api/chat", async (req, res) => {
+    if (!IS_OLLAMA_ENABLED) {
+    return res.status(501).json({
+      error: "LLM is not available in deployed version. Please run locally with Ollama.",
+    });
+  }
+
   const messages = req.body.messages || [];
 
   const systemPrompt = `
@@ -177,6 +188,9 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
   }
 });
 
-app.listen(5000, () => {
-  console.log("✅ Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
+
