@@ -101,69 +101,74 @@ function EmotionalSupport() {
     setShowSuggestions(true);
   };
 
-  const handleSend = async (text) => {
-    if (!text.trim()) return;
+ const handleSend = async (text) => {
+  if (!text.trim()) return;
 
-    const userMessage = { role: "user", content: text };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setInput("");
-    setIsTyping(true);
-    if (showSuggestions) setShowSuggestions(false);
+  const userMessage = { role: "user", content: text };
+  const updatedMessages = [...messages, userMessage];
+  setMessages(updatedMessages);
+  setInput("");
+  setIsTyping(true);
+  if (showSuggestions) setShowSuggestions(false);
 
-    try {
-      // This fetch logic remains the same
-      const res = await fetch("http://localhost:5000/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: updatedMessages.map(msg => ({ role: msg.role, content: msg.content })),
-        }),
-      });
+  try {
+    const res = await fetch("http://localhost:5000/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: updatedMessages.map(msg => ({ role: msg.role, content: msg.content })),
+      }),
+    });
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let accumulatedResponse = "";
-      let botMessageIndex = -1;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let botMessageIndex = -1;
+    let accumulatedResponse = "";
 
-      setMessages((prev) => {
-        const newMessages = [...prev, { role: "assistant", content: "" }];
-        botMessageIndex = newMessages.length - 1;
-        return newMessages;
-      });
+    // Create placeholder assistant message
+    setMessages(prev => {
+      const newMessages = [...prev, { role: "assistant", content: "" }];
+      botMessageIndex = newMessages.length - 1;
+      return newMessages;
+    });
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n\n").filter((line) => line.startsWith("data:"));
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-        for (const line of lines) {
-          try {
-            const jsonData = JSON.parse(line.substring(5));
-            const token = jsonData.token || jsonData.message?.content;
-            if (token) {
-              accumulatedResponse += token;
-              setMessages((prev) => {
-                const updated = [...prev];
-                if (botMessageIndex !== -1 && updated[botMessageIndex]) {
-                  updated[botMessageIndex].content = accumulatedResponse;
-                }
-                return updated;
-              });
-            }
-          } catch {}
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split("\n\n").filter(line => line.startsWith("data:"));
+
+      for (const line of lines) {
+        try {
+          const jsonData = JSON.parse(line.replace(/^data:\s*/, ""));
+          const token = jsonData.token || jsonData.message?.content;
+          if (token) {
+            accumulatedResponse += token;
+
+            setMessages(prev => {
+              const updated = [...prev];
+              if (botMessageIndex !== -1 && updated[botMessageIndex]) {
+                updated[botMessageIndex].content = accumulatedResponse;
+              }
+              return updated;
+            });
+          }
+        } catch (err) {
+          console.error("Error parsing stream chunk:", err);
         }
       }
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "❌ Network or internal server error. Please try again later." },
-      ]);
-    } finally {
-      setIsTyping(false);
     }
-  };
+  } catch (error) {
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: "❌ Network or internal server error. Please try again later." },
+    ]);
+  } finally {
+    setIsTyping(false);
+  }
+};
+
 
   return (
     <div style={styles.page}>
