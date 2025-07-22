@@ -100,11 +100,12 @@ app.post("/api/chat", async (req, res) => {
   }
 
   // ❌ No hardcoded match, and Ollama not available
-  if (!IS_OLLAMA_ENABLED) {
-    return res.status(501).json({
-      error: "LLM is not available in deployed version. Please run locally with Ollama.",
-    });
-  }
+ if (!IS_OLLAMA_ENABLED) {
+  const fallback = "Vanta AI is running in demo mode. Some responses may be limited, but you're not alone — I'm here for you.";
+  await streamString(res, fallback);
+  return;
+}
+
 
   // 🧠 Proceed with Ollama if enabled
   const systemPrompt = `
