@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import WarningPopup from "../components/WarningPopup";
 import TakedownHelp from "../components/TakedownHelp";
 
 function TakedownRequests() {
