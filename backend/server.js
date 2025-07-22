@@ -37,26 +37,41 @@ function getFuzzyMatchReply(userInput) {
   return match.bestMatch.rating > 0.6 ? hardcodedReplies[match.bestMatch.target] : null;
 }
 
+// IMPORTANT: This function is problematic for *streaming* tokens
+// because .trim() removes leading/trailing spaces essential for concatenation,
+// and replace(/\s+/g, " ") might be redundant or disruptive for single tokens.
+// It's generally better to sanitize the *final* complete response.
+// For now, we'll use it very carefully or remove it from the streaming path.
 function sanitizeAIText(text) {
+  // We specifically avoid .trim() and excessive space collapsing here for streaming,
+  // as the LLM output itself should handle natural spacing.
+  // If you must remove things like "Note:" mid-stream, it's more complex.
   return text
-    .replace(/note:.*$/gi, "")
-    .replace(/\*{1,2}.*?\*{1,2}/g, "")
-    .replace(/(I am an AI.*?model.*?)/gi, "")
-    .trim();
+    .replace(/note:.*$/gi, "") // This might still cut off part of a valid response if "Note:" appears mid-sentence.
+    .replace(/(I am an AI.*?model.*?)/gi, ""); // This is fine as it targets specific phrases.
+    // .replace(/\s+/g, " ") // Removed for streaming, as it could interfere with single spaces
+    // .trim(); // Removed for streaming, as it removes essential leading spaces
 }
 
-async function streamString(res, text, delayMs = 20) {
+
+async function streamString(res, text, delayMs = 30) {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
     Connection: "keep-alive",
   });
 
-  for (const word of text.split(" ")) {
-  res.write(`data: ${JSON.stringify({ token: word + " " })}\n\n`);
-  await new Promise((resolve) => setTimeout(resolve, delayMs));
-}
+  const words = text.split(/\s+/);
+  let firstToken = true;
 
+  for (const word of words) {
+    if (word) {
+      const token = firstToken ? word : " " + word;
+      res.write(`data: ${JSON.stringify({ token })}\n\n`);
+      firstToken = false;
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
 
   res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
   res.end();
@@ -88,7 +103,7 @@ app.post("/api/chat", async (req, res) => {
   }
 
   const systemPrompt = `
-You are Vanta AI — a warm, trauma-informed AI assistant created by a hackathon team. 
+You are Vanta AI — a warm, trauma-informed AI assistant created by a hackathon team.
 You are not built by Microsoft or OpenAI. You run locally using open-source models like Phi-3 via Ollama.
 
 Your role is to:
@@ -98,7 +113,7 @@ Your role is to:
 - Avoid robotic disclaimers like "Note:", "I am an AI model", etc.
 
 Be honest, respectful, and kind. Offer reassurance to users who are feeling unsafe or overwhelmed. Help them feel supported, not judged.
-`.trim();
+  `.trim();
 
   try {
     const finalMessages = [
@@ -131,7 +146,7 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
 
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
-    let lastPartial = "";
+    // Removed lastPartial as it's not needed for incremental token streams from Ollama
 
     for await (const chunk of ollamaResponse.body) {
       buffer += decoder.decode(chunk, { stream: true });
@@ -140,38 +155,41 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
       while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
         const line = buffer.slice(0, newlineIndex).trim();
         buffer = buffer.slice(newlineIndex + 1);
+        if (!line) continue;
 
-        if (line) {
-          try {
-            const parsed = JSON.parse(line);
+        try {
+          const parsed = JSON.parse(line);
 
-            if (parsed.message?.content) {
-              const content = sanitizeAIText(parsed.message.content);
-              const newText = content.startsWith(lastPartial)
-                ? content.slice(lastPartial.length)
-                : content;
-              lastPartial = content;
-
-              for (const char of newText) {
-                res.write(`data: ${JSON.stringify({ token: char })}\n\n`);
-                await new Promise(resolve => setTimeout(resolve, 10));
-              }
-            }
-
-            if (parsed.done) {
-              res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-              res.end();
-              return;
-            }
-          } catch {
-            // Ignore bad chunks
+          if (parsed.done) {
+            res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+            res.end();
+            return;
           }
+
+          if (parsed.message?.content) {
+            // Ollama's message.content is already the incremental token.
+            // Apply sanitization carefully, avoiding methods that remove crucial spaces.
+            const token = sanitizeAIText(parsed.message.content); // Apply only specific sanitization
+
+            // Send the token directly. Ollama usually includes leading spaces in tokens like " world".
+            res.write(`data: ${JSON.stringify({ token: token })}\n\n`);
+            await new Promise(resolve => setTimeout(resolve, 30));
+          }
+
+
+        } catch (e) {
+          // console.error("Error parsing Ollama stream chunk:", e.message, "Line:", line); // For debugging malformed chunks
+          // Ignore malformed chunks
         }
       }
     }
 
-    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-    res.end();
+    // ✅ Fallback done signal (if not already sent above)
+    if (!res.writableEnded) {
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
+    }
+
   } catch (err) {
     console.error("❌ AI Response Error:", err.message);
     if (!res.writableEnded) {
