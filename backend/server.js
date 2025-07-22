@@ -81,14 +81,30 @@ app.get("/", (req, res) => {
 
 // 🔄 Chat endpoint
 app.post("/api/chat", async (req, res) => {
-    if (!IS_OLLAMA_ENABLED) {
+  const messages = req.body.messages || [];
+
+  const lastUserMsg = messages.slice().reverse().find(m => m.role === "user")?.content;
+
+  if (!lastUserMsg) {
+    return res.status(400).json({ reply: "Please provide a valid message." });
+  }
+
+  // ✅ Check hardcoded replies first (this works even without Ollama)
+  const hardcoded = getFuzzyMatchReply(lastUserMsg);
+  if (hardcoded) {
+    console.log(`✅ Hardcoded reply for: "${lastUserMsg}"`);
+    await streamString(res, hardcoded);
+    return;
+  }
+
+  // ❌ No hardcoded match, and Ollama not available
+  if (!IS_OLLAMA_ENABLED) {
     return res.status(501).json({
       error: "LLM is not available in deployed version. Please run locally with Ollama.",
     });
   }
 
-  const messages = req.body.messages || [];
-
+  // 🧠 Proceed with Ollama if enabled
   const systemPrompt = `
 You are Vanta AI — a warm, trauma-informed AI assistant created by a hackathon team. 
 You are not built by Microsoft or OpenAI. You run locally using open-source models like Phi-3 via Ollama.
@@ -101,19 +117,6 @@ Your role is to:
 
 Be honest, respectful, and kind. Offer reassurance to users who are feeling unsafe or overwhelmed. Help them feel supported, not judged.
   `.trim();
-
-  const lastUserMsg = messages.slice().reverse().find(m => m.role === "user")?.content;
-
-  if (!lastUserMsg) {
-    return res.status(400).json({ reply: "Please provide a valid message." });
-  }
-
-  const hardcoded = getFuzzyMatchReply(lastUserMsg);
-  if (hardcoded) {
-    console.log(`✅ Hardcoded reply for: "${lastUserMsg}"`);
-    await streamString(res, hardcoded);
-    return;
-  }
 
   try {
     const finalMessages = [
@@ -156,7 +159,6 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
           try {
             const parsed = JSON.parse(line);
 
-            // ✅ Output cleaned AI content
             if (parsed.message?.content) {
               const cleaned = sanitizeAIText(parsed.message.content);
               res.write(`data: ${JSON.stringify({ token: cleaned })}\n\n`);
@@ -168,7 +170,7 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
               return;
             }
           } catch {
-            // Ignore malformed lines
+            // skip malformed lines
           }
         }
       }
@@ -189,6 +191,9 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
     }
   }
 });
+
+
+    
 
 const PORT = process.env.PORT || 5000;
 
