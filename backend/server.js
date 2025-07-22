@@ -1,5 +1,7 @@
 //backend deployed at:https://vantaai.onrender.com/
 //deployed on VantaAI:https://backend-gv71.onrender.com/
+process.env.OLLAMA_MODE = "local";
+
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
