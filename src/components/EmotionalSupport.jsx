@@ -114,12 +114,13 @@ function EmotionalSupport() {
     try {
       // This fetch logic remains the same
       const res = await fetch("https://backend-gv71.onrender.com/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: updatedMessages.map(msg => ({ role: msg.role, content: msg.content })),
-        }),
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    messages: updatedMessages.map(msg => ({ role: msg.role, content: msg.content })),
+  }),
+});
+
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder("utf-8");
