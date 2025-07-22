@@ -113,7 +113,7 @@ function EmotionalSupport() {
 
     try {
       // This fetch logic remains the same
-      const res = await fetch("https://backend-gv71.onrender.com/", {
+      const res = await fetch("https://backend-gv71.onrender.com/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
