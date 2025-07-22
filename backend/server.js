@@ -6,7 +6,7 @@ import cors from "cors";
 import fetch from "node-fetch";
 import stringSimilarity from "string-similarity";
 
-const IS_OLLAMA_ENABLED = true; // 🔁 Change to false if Ollama is not running
+const IS_OLLAMA_ENABLED = true; // Leave true if you want to use Ollama
 
 const app = express();
 app.use(cors());
@@ -15,19 +15,13 @@ app.use(express.json());
 const OLLAMA_API_URL = "http://localhost:11434/api/chat";
 const MODEL_NAME = "phi3:mini";
 
-// ✅ Hardcoded Q&A pairs
+// ✅ Hardcoded replies
 const hardcodedReplies = {
   "hi": "Hello! It's good to hear from you. Take your time, and please know this is a safe space if you ever want to share what's on your mind.",
   "hello": "Hello! It's good to hear from you. Take your time, and please know this is a safe space if you ever want to share what's on your mind.",
   "what is vanta ai": "Vanta AI is a safety and privacy-focused platform that helps users protect themselves online.",
   "who built vanta ai": "Vanta AI was built by a passionate team during a hackathon to ensure digital safety.",
-  "who developed vanta ai": "Vanta AI was built by a passionate team during a hackathon to ensure digital safety.",
-  "who created vanta ai": "Vanta AI was built by a passionate team during a hackathon to ensure digital safety.",
-  "who made vanta ai": "Vanta AI was built by a passionate team during a hackathon to ensure digital safety.",
-  "who is the developer of vanta ai": "Vanta AI was built by a passionate team during a hackathon to ensure digital safety.",
   "features of vanta ai": "Vanta AI includes in-app warnings, consent checks, instant takedown, legal directory, and more.",
-  "tell features of vanta ai": "Vanta AI includes in-app warnings, consent checks, instant takedown, legal directory, and more.",
-  "how does vanta ai work": "Vanta AI uses AI to help detect, prevent, and respond to digital threats in real-time.",
   "i am mentally broken": "To feel mentally broken after what you've been through makes complete sense. You don't have to go through this alone — I'm here for you.",
   "do you store my data": "No, I don’t store or track anything. Vanta AI runs locally to protect your privacy.",
   "are you from microsoft": "No, I’m not. Vanta AI was built by a hackathon team using open-source models.",
@@ -36,18 +30,13 @@ const hardcodedReplies = {
   "is my data safe": "Yes. Vanta AI processes everything locally and does not share or store your data.",
 };
 
-// 🔍 Fuzzy matching
 function getFuzzyMatchReply(userInput) {
-  const normalizedInput = userInput.toLowerCase().replace(/[^\w\s]/gi, "");
+  const normalized = userInput.toLowerCase().replace(/[^\w\s]/gi, "");
   const questions = Object.keys(hardcodedReplies);
-  const match = stringSimilarity.findBestMatch(normalizedInput, questions);
-  if (match.bestMatch.rating > 0.6) {
-    return hardcodedReplies[match.bestMatch.target];
-  }
-  return null;
+  const match = stringSimilarity.findBestMatch(normalized, questions);
+  return match.bestMatch.rating > 0.6 ? hardcodedReplies[match.bestMatch.target] : null;
 }
 
-// 🧼 Clean AI-generated replies
 function sanitizeAIText(text) {
   return text
     .replace(/note:.*$/gi, "")
@@ -56,7 +45,6 @@ function sanitizeAIText(text) {
     .trim();
 }
 
-// ✨ Streaming function
 async function streamString(res, text, delayMs = 20) {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
@@ -64,11 +52,11 @@ async function streamString(res, text, delayMs = 20) {
     Connection: "keep-alive",
   });
 
-  for (let i = 0; i < text.length; i++) {
-    const token = text[i];
-    res.write(`data: ${JSON.stringify({ token })}\n\n`);
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
-  }
+  for (const word of text.split(" ")) {
+  res.write(`data: ${JSON.stringify({ token: word + " " })}\n\n`);
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
 
   res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
   res.end();
@@ -78,10 +66,8 @@ app.get("/", (req, res) => {
   res.send("✅ Vanta AI backend is live.");
 });
 
-// 🔄 Chat endpoint
 app.post("/api/chat", async (req, res) => {
   const messages = req.body.messages || [];
-
   const lastUserMsg = messages.slice().reverse().find(m => m.role === "user")?.content;
 
   if (!lastUserMsg) {
@@ -131,7 +117,10 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
     });
 
     if (!ollamaResponse.ok || !ollamaResponse.body) {
-      throw new Error("Failed to get response from Ollama");
+      console.log("⚠️ Ollama is unreachable, falling back to demo mode");
+      const fallback = "Vanta AI is running in demo mode. Some responses may be limited, but you're not alone — I'm here for you.";
+      await streamString(res, fallback);
+      return;
     }
 
     res.writeHead(200, {
@@ -142,6 +131,7 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
 
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
+    let lastPartial = "";
 
     for await (const chunk of ollamaResponse.body) {
       buffer += decoder.decode(chunk, { stream: true });
@@ -156,8 +146,16 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
             const parsed = JSON.parse(line);
 
             if (parsed.message?.content) {
-              const cleaned = sanitizeAIText(parsed.message.content);
-              res.write(`data: ${JSON.stringify({ token: cleaned })}\n\n`);
+              const content = sanitizeAIText(parsed.message.content);
+              const newText = content.startsWith(lastPartial)
+                ? content.slice(lastPartial.length)
+                : content;
+              lastPartial = content;
+
+              for (const char of newText) {
+                res.write(`data: ${JSON.stringify({ token: char })}\n\n`);
+                await new Promise(resolve => setTimeout(resolve, 10));
+              }
             }
 
             if (parsed.done) {
@@ -166,7 +164,7 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
               return;
             }
           } catch {
-            // skip malformed lines
+            // Ignore bad chunks
           }
         }
       }
