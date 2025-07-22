@@ -4,12 +4,9 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
-import dotenv from "dotenv";
 import stringSimilarity from "string-similarity";
 
-dotenv.config();
-const IS_OLLAMA_ENABLED = process.env.OLLAMA_MODE === "local";
-
+const IS_OLLAMA_ENABLED = true; // 🔁 Change to false if Ollama is not running
 
 const app = express();
 app.use(cors());
@@ -53,9 +50,9 @@ function getFuzzyMatchReply(userInput) {
 // 🧼 Clean AI-generated replies
 function sanitizeAIText(text) {
   return text
-    .replace(/note:.*$/gi, "") // Remove "Note: ..."
-    .replace(/\*{1,2}.*?\*{1,2}/g, "") // Remove bold markdown
-    .replace(/(I am an AI.*?model.*?)/gi, "") // Remove "I am an AI..." statements
+    .replace(/note:.*$/gi, "")
+    .replace(/\*{1,2}.*?\*{1,2}/g, "")
+    .replace(/(I am an AI.*?model.*?)/gi, "")
     .trim();
 }
 
@@ -76,6 +73,7 @@ async function streamString(res, text, delayMs = 20) {
   res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
   res.end();
 }
+
 app.get("/", (req, res) => {
   res.send("✅ Vanta AI backend is live.");
 });
@@ -90,7 +88,6 @@ app.post("/api/chat", async (req, res) => {
     return res.status(400).json({ reply: "Please provide a valid message." });
   }
 
-  // ✅ Check hardcoded replies first (this works even without Ollama)
   const hardcoded = getFuzzyMatchReply(lastUserMsg);
   if (hardcoded) {
     console.log(`✅ Hardcoded reply for: "${lastUserMsg}"`);
@@ -98,15 +95,12 @@ app.post("/api/chat", async (req, res) => {
     return;
   }
 
-  // ❌ No hardcoded match, and Ollama not available
- if (!IS_OLLAMA_ENABLED) {
-  const fallback = "Vanta AI is running in demo mode. Some responses may be limited, but you're not alone — I'm here for you.";
-  await streamString(res, fallback);
-  return;
-}
+  if (!IS_OLLAMA_ENABLED) {
+    const fallback = "Vanta AI is running in demo mode. Some responses may be limited, but you're not alone — I'm here for you.";
+    await streamString(res, fallback);
+    return;
+  }
 
-
-  // 🧠 Proceed with Ollama if enabled
   const systemPrompt = `
 You are Vanta AI — a warm, trauma-informed AI assistant created by a hackathon team. 
 You are not built by Microsoft or OpenAI. You run locally using open-source models like Phi-3 via Ollama.
@@ -118,7 +112,7 @@ Your role is to:
 - Avoid robotic disclaimers like "Note:", "I am an AI model", etc.
 
 Be honest, respectful, and kind. Offer reassurance to users who are feeling unsafe or overwhelmed. Help them feel supported, not judged.
-  `.trim();
+`.trim();
 
   try {
     const finalMessages = [
@@ -194,12 +188,7 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
   }
 });
 
-
-    
-
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
-
