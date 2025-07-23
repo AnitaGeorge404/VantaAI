@@ -144,7 +144,9 @@ function EmotionalSupport() {
           const jsonData = JSON.parse(line.replace(/^data:\s*/, ""));
           const token = jsonData.token || jsonData.message?.content;
           if (token) {
-            accumulatedResponse += token;
+           accumulatedResponse += token;
+
+
 
             setMessages(prev => {
               const updated = [...prev];
