@@ -35,4 +35,4 @@ __pycache__/
 *.sqlite3
 
 # Local dev environment
-.env.local
+.env.localbackend/*.json
