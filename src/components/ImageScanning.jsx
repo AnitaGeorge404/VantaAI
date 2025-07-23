@@ -1,168 +1,199 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 
-function ImageScanning() {
+const ImageScanning = () => {
   const [image, setImage] = useState(null);
-  const [results, setResults] = useState([]);
+  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
-    setResults([]);
-    setError("");
+    setResult(null);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!image) return;
 
     const formData = new FormData();
-    formData.append("image", image);
-
+    formData.append('file', image);
     setLoading(true);
-    try {
-      const res = await axios.post("http://localhost:8000/scan-image", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      console.log(res);
 
-      setResults(res.data.matches || []);
-      setError(res.data.error || "");
+    try {
+      const res = await fetch('http://localhost:8000/web-detect/', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      setResult(data);
     } catch (err) {
-      const msg =
-        err?.response?.data?.error || "Unexpected error. Try again.";
-      setError(msg);
+      console.error('Error:', err);
+      setResult({ error: 'Something went wrong. Please try again.' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>🌐 AI Image Scanner</h2>
+    <div style={styles.wrapper}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Scan & Detect 🔍</h2>
+        <p style={styles.subtitle}>
+          Identify if your image is being misused online
+        </p>
 
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <label htmlFor="file-upload" style={styles.uploadBox}>
-          {image ? image.name : "Click to Upload or Drop Image"}
-          <input
-            id="file-upload"
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            style={{ display: "none" }}
-          />
-        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          style={styles.fileInput}
+        />
 
-        <button type="submit" style={styles.analyzeBtn} disabled={loading || !image}>
-          {loading ? "Scanning..." : "Scan Image"}
+        <button onClick={handleSubmit} style={styles.button}>
+          {loading ? 'Scanning...' : 'Scan Image'}
         </button>
-      </form>
 
-      {error && <div style={styles.errorBox}>⚠️ {error}</div>}
+        {result && (
+          <div style={styles.resultSection}>
+            {result.error && (
+              <p style={{ color: 'red', textAlign: 'center' }}>
+                {result.error}
+              </p>
+            )}
 
-      {results.length > 0 && (
-        <div style={styles.resultBox}>
-          <h3 style={styles.resultTitle}>🔍 Matches Found:</h3>
-          <ul style={styles.matchList}>
-            {results.map((r, i) => (
-              <li key={i} style={styles.matchItem}>
-                <a href={r.url} target="_blank" rel="noreferrer" style={styles.matchLink}>
-                  {r.name || r.url}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+            {result.fullMatches?.length > 0 && (
+              <>
+                <h3 style={styles.sectionTitle}>🔗 Exact Matches</h3>
+                <ul style={styles.linkList}>
+                  {result.fullMatches.map((url, idx) => (
+                    <li key={idx}>
+                      <a href={url} target="_blank" rel="noopener noreferrer">
+                        {url}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
 
-      {!loading && image && results.length === 0 && !error && (
-        <div style={styles.resultBox}>
-          <h3 style={styles.resultTitle}>✅ No matches found</h3>
-          <p style={{ color: "#444" }}>This image doesn’t appear publicly on the web.</p>
-        </div>
-      )}
+            {result.partialMatches?.length > 0 && (
+              <>
+                <h3 style={styles.sectionTitle}>🧩 Partial Matches</h3>
+                <ul style={styles.linkList}>
+                  {result.partialMatches.map((url, idx) => (
+                    <li key={idx}>
+                      <a href={url} target="_blank" rel="noopener noreferrer">
+                        {url}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            {result.visuallySimilarImages?.length > 0 && (
+              <>
+                <h3 style={styles.sectionTitle}>🖼️ Visually Similar</h3>
+                <div style={styles.imageGrid}>
+                  {result.visuallySimilarImages.map((url, idx) => (
+                    <a
+                      key={idx}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img src={url} alt="similar" style={styles.thumb} />
+                    </a>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
 
 const styles = {
-  container: {
-    background: "linear-gradient(135deg, #fbefff, #e4f3ff)",
-    padding: "2rem",
-    borderRadius: "20px",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-    maxWidth: "500px",
-    margin: "2rem auto",
-    fontFamily: "'Segoe UI', sans-serif"
+  wrapper: {
+    minHeight: '100vh',
+    background: 'linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)',
+    fontFamily: "'Inter', sans-serif",
+    padding: '32px 16px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  card: {
+    width: '100%',
+    maxWidth: '600px',
+    backgroundColor: 'white',
+    borderRadius: '20px',
+    padding: '24px',
+    boxShadow: '0 6px 20px rgba(109, 40, 217, 0.08)',
+    border: '1px solid rgba(255, 255, 255, 0.6)',
   },
   title: {
-    textAlign: "center",
-    fontSize: "1.8rem",
-    color: "#4c4081",
-    marginBottom: "1.5rem"
+    fontSize: '22px',
+    fontWeight: '700',
+    fontFamily: "'Lora', serif",
+    color: '#3949ab',
+    textAlign: 'center',
   },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
+  subtitle: {
+    fontSize: '14px',
+    color: '#64748B',
+    textAlign: 'center',
+    marginBottom: '20px',
   },
-  uploadBox: {
-    background: "linear-gradient(to right, #f3eaff, #e6f7ff)",
-    border: "2px dashed #bbb",
-    padding: "1.5rem",
-    width: "100%",
-    textAlign: "center",
-    borderRadius: "15px",
-    cursor: "pointer",
-    color: "#666",
-    marginBottom: "1rem",
-    transition: "all 0.3s ease"
+  fileInput: {
+    width: '100%',
+    padding: '10px',
+    borderRadius: '12px',
+    border: '1px solid #ccc',
+    marginBottom: '12px',
   },
-  analyzeBtn: {
-    background: "#8a63d2",
-    color: "white",
-    border: "none",
-    padding: "0.8rem 1.2rem",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    transition: "background 0.3s ease"
+  button: {
+    width: '100%',
+    padding: '12px',
+    backgroundColor: '#6D28D9',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '12px',
+    fontSize: '15px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    marginBottom: '16px',
   },
-  errorBox: {
-    color: "#d33",
-    background: "#fff0f0",
-    padding: "1rem",
-    borderRadius: "10px",
-    marginTop: "1rem",
-    textAlign: "center"
+  resultSection: {
+    marginTop: '20px',
   },
-  resultBox: {
-    marginTop: "2rem",
-    background: "#fff9fe",
-    padding: "1.2rem",
-    borderRadius: "15px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+  sectionTitle: {
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#1E3A8A',
+    marginTop: '16px',
+    marginBottom: '8px',
   },
-  resultTitle: {
-    color: "#4a3085",
-    marginBottom: "1rem"
+  linkList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    lineHeight: '1.7',
+    wordBreak: 'break-word',
   },
-  matchList: {
-    listStyle: "none",
-    padding: 0
+  imageGrid: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '10px',
+    marginTop: '10px',
   },
-  matchItem: {
-    margin: "0.5rem 0",
-    background: "#f2f6ff",
-    padding: "0.7rem",
-    borderRadius: "10px"
+  thumb: {
+    width: '90px',
+    height: '90px',
+    borderRadius: '8px',
+    objectFit: 'cover',
+    border: '1px solid #ddd',
   },
-  matchLink: {
-    textDecoration: "none",
-    color: "#2d5dd7",
-    fontWeight: 500
-  }
 };
 
 export default ImageScanning;

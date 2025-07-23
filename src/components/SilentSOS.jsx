@@ -1,24 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const blobToBase64 = (blob) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result;
-      if (!result) return reject('Empty reader result');
-      const base64 = result.split(',')[1];
-      base64 ? resolve(base64) : reject('Base64 split failed');
-    };
-    reader.onerror = (err) => reject('FileReader error: ' + err.message);
-    reader.readAsDataURL(blob);
-  });
+const uploadToFileIO = async (blob, filename, type) => {
+  const formData = new FormData();
+  formData.append('file', blob, filename);
+
+  try {
+    const response = await fetch('https://file.io/', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to upload to file.io: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    if (data.success) {
+      console.log(`✅ ${type} uploaded to file.io: ${data.link}`);
+      return data.link; // file.io provides a direct download link
+    } else {
+      throw new Error(`file.io upload failed: ${data.message || 'Unknown error'}`);
+    }
+  } catch (err) {
+    console.error(`❌ Error uploading ${type} to file.io:`, err);
+    alert(`Failed to upload ${type} evidence: ${err.message}`);
+    return null;
+  }
+};
 
 const SilentSOS = () => {
   const [clickCount, setClickCount] = useState(0);
   const [tempClickCount, setTempClickCount] = useState(0);
+  const [evidenceLinks, setEvidenceLinks] = useState({ video: null, audio: null, screen: null });
   const clickTimerRef = useRef(null);
   const tempClickTimerRef = useRef(null);
-
 
   const weather = {
     location: 'New York, NY',
@@ -42,34 +58,34 @@ const SilentSOS = () => {
       setClickCount(0);
     }
   };
-  
+
   const handleTempClick = () => {
     setTempClickCount((prev) => prev + 1);
     clearTimeout(tempClickTimerRef.current);
-    tempClickTimerRef.current = setTimeout(() => setTempClickCount(0), 3000); 
+    tempClickTimerRef.current = setTimeout(() => setTempClickCount(0), 3000);
 
     if (tempClickCount + 1 >= 5) {
       console.log('Download triggered by temperature click.');
       handleDownloadAllEvidence();
-      setTempClickCount(0); 
+      setTempClickCount(0);
     }
   };
 
   useEffect(() => {
     const handleKey = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === 'S') {
-        e.preventDefault(); 
+        e.preventDefault();
         triggerSOS();
       }
       if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-        e.preventDefault(); 
+        e.preventDefault();
         console.log('Download triggered by keyboard shortcut.');
         handleDownloadAllEvidence();
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, []); 
+  }, [evidenceLinks]); // Add evidenceLinks to dependency array to ensure latest state is used for download
 
   const triggerSOS = async () => {
     console.log('🔴 SOS Triggered');
@@ -85,8 +101,19 @@ const SilentSOS = () => {
       alert('Screen recording not supported on this device.');
     }
 
-    await Promise.all(recordingPromises);
-    alert('Evidence recording complete and saved locally.');
+    const results = await Promise.all(recordingPromises);
+
+    setEvidenceLinks((prevLinks) => {
+      const newLinks = { ...prevLinks };
+      results.forEach(result => {
+        if (result && result.type && result.link) {
+          newLinks[result.type] = result.link;
+        }
+      });
+      return newLinks;
+    });
+
+    alert('Evidence recording complete. Files are temporarily available for download.');
   };
 
   const recordMedia = async (constraints, type, duration = 10000) => {
@@ -94,32 +121,33 @@ const SilentSOS = () => {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (!stream || stream.getTracks().length === 0) {
         console.warn(`🚫 No ${type} stream available.`);
-        return;
+        return null;
       }
       const mimeType = type === 'audio' ? 'audio/webm;codecs=opus' : 'video/webm;codecs=vp8,opus';
       const recorder = new MediaRecorder(stream, { mimeType });
       const chunks = [];
       recorder.ondataavailable = (e) => e.data.size > 0 && chunks.push(e.data);
-      recorder.onstop = async () => {
-        if (chunks.length === 0) {
-          console.warn(`⚠️ No chunks captured for ${type}`);
-        } else {
-          const blob = new Blob(chunks, { type: mimeType });
-          try {
-            const base64 = await blobToBase64(blob);
-            localStorage.setItem(`evidence_${type}`, JSON.stringify({ base64 }));
-            console.log(`✅ ${type} saved successfully`);
-          } catch (err) {
-            console.error(`❌ Failed to convert ${type} to base64:`, err);
+
+      return new Promise((resolve) => {
+        recorder.onstop = async () => {
+          if (chunks.length === 0) {
+            console.warn(`⚠️ No chunks captured for ${type}`);
+            resolve(null);
+          } else {
+            const blob = new Blob(chunks, { type: mimeType });
+            const filename = `${type}_evidence_${Date.now()}.webm`;
+            const link = await uploadToFileIO(blob, filename, type);
+            resolve({ type, link });
           }
-        }
-        stream.getTracks().forEach((t) => t.stop());
-      };
-      recorder.start();
-      setTimeout(() => recorder.state === 'recording' && recorder.stop(), Math.max(duration, 5000));
+          stream.getTracks().forEach((t) => t.stop());
+        };
+        recorder.start();
+        setTimeout(() => recorder.state === 'recording' && recorder.stop(), Math.max(duration, 5000));
+      });
     } catch (err) {
       console.error(`❌ Failed to record ${type}:`, err.message);
       alert(`Access denied for ${type}. Please allow camera/microphone permissions in your browser settings.`);
+      return null;
     }
   };
 
@@ -129,35 +157,36 @@ const SilentSOS = () => {
       const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8,opus' });
       const chunks = [];
       recorder.ondataavailable = (e) => e.data.size > 0 && chunks.push(e.data);
-      recorder.onstop = async () => {
-        if (chunks.length === 0) {
-          console.warn(`⚠️ No chunks captured for screen`);
-        } else {
-          const blob = new Blob(chunks, { type: 'video/webm' });
-          try {
-            const base64 = await blobToBase64(blob);
-            localStorage.setItem(`evidence_screen`, JSON.stringify({ base64 }));
-            console.log('✅ Screen recording saved');
-          } catch (err) {
-            console.error('❌ Screen base64 conversion failed:', err);
+
+      return new Promise((resolve) => {
+        recorder.onstop = async () => {
+          if (chunks.length === 0) {
+            console.warn(`⚠️ No chunks captured for screen`);
+            resolve(null);
+          } else {
+            const blob = new Blob(chunks, { type: 'video/webm' });
+            const filename = `screen_evidence_${Date.now()}.webm`;
+            const link = await uploadToFileIO(blob, filename, 'screen');
+            resolve({ type: 'screen', link });
           }
-        }
-        stream.getTracks().forEach((t) => t.stop());
-      };
-      recorder.start();
-      setTimeout(() => recorder.state === 'recording' && recorder.stop(), duration);
+          stream.getTracks().forEach((t) => t.stop());
+        };
+        recorder.start();
+        setTimeout(() => recorder.state === 'recording' && recorder.stop(), duration);
+      });
     } catch (err) {
       console.error('❌ Screen recording error:', err.message);
+      return null;
     }
   };
 
   const handleDownloadAllEvidence = () => {
     let downloadedCount = 0;
     const types = ['video', 'audio', 'screen'];
-    
+
     types.forEach(type => {
-      if (localStorage.getItem(`evidence_${type}`)) {
-        downloadEvidence(type);
+      if (evidenceLinks[type]) {
+        downloadEvidence(type, evidenceLinks[type]);
         downloadedCount++;
       }
     });
@@ -167,20 +196,21 @@ const SilentSOS = () => {
     }
   };
 
-  const downloadEvidence = (type) => {
+  const downloadEvidence = (type, url) => {
+    if (!url) {
+      console.error(`No URL available for ${type} evidence.`);
+      alert(`No download link available for ${type} evidence.`);
+      return;
+    }
     try {
-      const item = localStorage.getItem(`evidence_${type}`);
-      if (!item) return;
-      const { base64 } = JSON.parse(item);
-      if (!base64) throw new Error('Missing base64 data in storage');
-      const mimeType = type === 'audio' ? 'audio/webm' : 'video/webm';
-      const url = `data:${mimeType};base64,${base64}`;
       const a = document.createElement('a');
       a.href = url;
+      // file.io typically handles the filename, but we can suggest one
       a.download = `${type}_evidence_${Date.now()}.webm`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      console.log(`✅ Download initiated for ${type} from ${url}`);
     } catch (err) {
       console.error(`Download error for ${type}:`, err);
       alert(`Could not download ${type} evidence: ${err.message}`);
@@ -220,6 +250,27 @@ const SilentSOS = () => {
             <span>{getIcon(f.condition)} {f.high}° / {f.low}°</span>
           </div>
         ))}
+        {/* Optional: Display download buttons if links exist */}
+        {(evidenceLinks.video || evidenceLinks.audio || evidenceLinks.screen) && (
+          <div style={styles.downloadSection}>
+            <p>Evidence is ready for download:</p>
+            {evidenceLinks.video && (
+              <button onClick={() => downloadEvidence('video', evidenceLinks.video)} style={styles.button}>
+                Download Video Evidence
+              </button>
+            )}
+            {evidenceLinks.audio && (
+              <button onClick={() => downloadEvidence('audio', evidenceLinks.audio)} style={{ ...styles.button, marginLeft: 10 }}>
+                Download Audio Evidence
+              </button>
+            )}
+            {evidenceLinks.screen && (
+              <button onClick={() => downloadEvidence('screen', evidenceLinks.screen)} style={{ ...styles.button, marginLeft: 10 }}>
+                Download Screen Recording
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -280,6 +331,7 @@ const styles = {
     fontWeight: 'bold',
     fontSize: '16px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    marginTop: 10, // Added margin-top for spacing
   },
 };
 

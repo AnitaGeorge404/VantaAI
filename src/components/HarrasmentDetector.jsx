@@ -243,73 +243,86 @@ const HarassmentDetector = () => {
           fontFamily:
             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           height: "100vh",
-          width: "100%",
-          maxWidth: "400px",
-          margin: "0 auto",
+
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: "24px",
           background:
             "linear-gradient(180deg, #E8D5FF 0%, #F0E9FF 25%, #E0E7FF 50%, #DBEAFE 75%, #E8D5FF 100%)",
+          width: "100%",
+          position: "absolute",
+          top: "0",
+          alignSelf: "center",
         }}
       >
-        <h1
-          style={{
-            fontSize: "24px",
-            fontWeight: "bold",
-            color: "#6B46C1",
-            textAlign: "center",
-            marginBottom: "24px",
-          }}
-        >
-          AI Safety Chat
-        </h1>
-        <input
-          type="text"
-          placeholder="Your Name"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{
-            padding: "12px",
-            marginBottom: "12px",
-            borderRadius: "12px",
-            border: "1px solid #ddd",
-            fontSize: "16px",
-          }}
-        />
-        <input
-          type="text"
-          placeholder="Room Name"
-          value={room}
-          onChange={(e) => setRoom(e.target.value)}
-          style={{
-            padding: "12px",
-            marginBottom: "24px",
-            borderRadius: "12px",
-            border: "1px solid #ddd",
-            fontSize: "16px",
-          }}
-        />
-        <button
-          onClick={joinRoom}
+        <div
           style={{
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-            padding: "12px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#8B5CF6",
-            color: "white",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
+            width: "100%",
+            padding: 0,
           }}
         >
-          <LogIn size={20} /> Join Chat
-        </button>
+          <h1
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#6B46C1",
+              textAlign: "center",
+              marginBottom: "24px",
+            }}
+          >
+            AI Safety Chat
+          </h1>
+          <input
+            type="text"
+            placeholder="Your Name"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{
+              padding: "12px",
+              marginBottom: "12px",
+              borderRadius: "12px",
+              border: "1px solid #ddd",
+              fontSize: "16px",
+              width: "70%",
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Room Name"
+            value={room}
+            onChange={(e) => setRoom(e.target.value)}
+            style={{
+              padding: "12px",
+              marginBottom: "24px",
+              borderRadius: "12px",
+              border: "1px solid #ddd",
+              fontSize: "16px",
+              width: "70%",
+            }}
+          />
+          <button
+            onClick={joinRoom}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              padding: "12px",
+              borderRadius: "12px",
+              border: "none",
+              backgroundColor: "#8B5CF6",
+              color: "white",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            <LogIn size={20} /> Join Chat
+          </button>
+        </div>
       </div>
     );
   }
@@ -321,13 +334,13 @@ const HarassmentDetector = () => {
           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         height: "100vh",
         width: "100%",
-        maxWidth: "400px",
         margin: "0 auto",
         display: "flex",
         flexDirection: "column",
         background:
           "linear-gradient(180deg, #E8D5FF 0%, #F0E9FF 25%, #E0E7FF 50%, #DBEAFE 75%, #E8D5FF 100%)",
-        position: "relative",
+        position: "absolute",
+        top: "0",
       }}
     >
       <div
