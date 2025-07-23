@@ -4,16 +4,10 @@ import TakedownHelp from "../components/TakedownHelp";
 function TakedownRequests() {
   const [mode, setMode] = useState("file");
   const [input, setInput] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
   const [proceed, setProceed] = useState(false);
 
-  const handleAnalyze = () => {
-    if (!input) return;
-    setShowPopup(true);
-  };
-
   const handleProceed = () => {
-    setShowPopup(false);
+    if (!input) return;
     setProceed(true);
   };
 
@@ -101,7 +95,7 @@ function TakedownRequests() {
         ) : (
           <input
             type="text"
-            value={input}
+            value={typeof input === "string" ? input : ""}
             placeholder="Paste the link here"
             onChange={(e) => setInput(e.target.value)}
             style={{
@@ -115,7 +109,7 @@ function TakedownRequests() {
         )}
 
         <button
-          onClick={handleAnalyze}
+          onClick={handleProceed}
           style={{
             padding: "12px 20px",
             backgroundColor: "#43016E",
@@ -128,15 +122,6 @@ function TakedownRequests() {
         >
           Submit
         </button>
-
-        {/* Popup */}
-        {showPopup && (
-          <WarningPopup
-            message="Are you sure you want to proceed?"
-            onCancel={() => setShowPopup(false)}
-            onProceed={handleProceed}
-          />
-        )}
 
         {/* Instructions after Proceed */}
         {proceed && (
