@@ -327,40 +327,7 @@ const SilentSOS = () => {
               </span>
             </div>
           ))}
-          {/* Optional: Display download buttons if links exist */}
-          {(evidenceLinks.video ||
-            evidenceLinks.audio ||
-            evidenceLinks.screen) && (
-            <div style={styles.downloadSection}>
-              <p>Evidence is ready for download:</p>
-              {evidenceLinks.video && (
-                <button
-                  onClick={() => downloadEvidence("video", evidenceLinks.video)}
-                  style={styles.button}
-                >
-                  Download Video Evidence
-                </button>
-              )}
-              {evidenceLinks.audio && (
-                <button
-                  onClick={() => downloadEvidence("audio", evidenceLinks.audio)}
-                  style={{ ...styles.button, marginLeft: 10 }}
-                >
-                  Download Audio Evidence
-                </button>
-              )}
-              {evidenceLinks.screen && (
-                <button
-                  onClick={() =>
-                    downloadEvidence("screen", evidenceLinks.screen)
-                  }
-                  style={{ ...styles.button, marginLeft: 10 }}
-                >
-                  Download Screen Recording
-                </button>
-              )}
-            </div>
-          )}
+          {/* Download buttons have been removed for discretion */}
         </div>
       </div>
     </div>
@@ -411,19 +378,6 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     padding: "5px 0",
-  },
-  downloadSection: { marginTop: 20, textAlign: "center" },
-  button: {
-    padding: "12px 20px",
-    background: "#fff",
-    color: "#0984e3",
-    border: "none",
-    borderRadius: 8,
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "16px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-    marginTop: 10, // Added margin-top for spacing
   },
 };
 
