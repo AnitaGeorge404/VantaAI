@@ -60,7 +60,7 @@ const DeepfakeDetector = () => {
         fontFamily: "sans-serif",
         maxWidth: "500px",
         margin: "auto",
-        
+        backgroundColor:"white",
         padding: "2rem",
         borderRadius: "1rem",
         minHeight: "100vh"
