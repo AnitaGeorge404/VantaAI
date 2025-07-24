@@ -164,7 +164,7 @@ function EmotionalSupport() {
   } catch (error) {
     setMessages((prev) => [
       ...prev,
-      { role: "assistant", content: "❌ Network or internal server error. Please try again later." },
+      { role: "assistant", content: "Connection Error: Vanta AI cannot reach its local AI model. Please ensure the Vanta AI backend service is active." },
     ]);
   } finally {
     setIsTyping(false);
