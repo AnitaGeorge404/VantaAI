@@ -6,7 +6,7 @@ import { FileSignature, Mail, ShieldOff } from 'lucide-react';
 function ReportScreen() {
   const cardData = [
     {
-      title: 'One-Click Legal Complaints',
+      title: 'Legal Complaints',
       description: 'Quickly file abuse reports with prefilled legal forms.',
       icon: FileSignature,
       path: '/LegalComplaints',
