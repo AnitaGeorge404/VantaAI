@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ShieldCheck, Search, FileText, Heart } from 'lucide-react';
+import { Home, ShieldCheck, Search, FileText, Scale } from 'lucide-react';
 
 function BottomNav() {
   const { pathname } = useLocation();
@@ -10,7 +10,7 @@ function BottomNav() {
     { path: '/prevent', icon: ShieldCheck, label: 'Prevention' },
     { path: '/detect', icon: Search, label: 'Detection' },
     { path: '/report', icon: FileText, label: 'Reporting' },
-    { path: '/legal', icon: Heart, label: 'Support' }
+    { path: '/legal', icon: Scale, label: 'Support' }
   ];
 
   return (

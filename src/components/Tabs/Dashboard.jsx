@@ -26,6 +26,12 @@ function Dashboard() {
       path: '/prevent',
     },
     {
+      title: 'Scan & Detect',
+      description: 'Identify unauthorized use of your images & videos.',
+      icon: Search,
+      path: '/detect',
+    },
+    {
       title: 'Report Violations',
       description: 'Secure reporting with one-click submission.',
       icon: Send,
@@ -44,6 +50,12 @@ function Dashboard() {
       path: '/support',
     },
     {
+      title: 'Silent SOS',
+      description: 'Discreet alerts for immediate assistance in a crisis.',
+      icon: AlertTriangle,
+      path: '/sos',
+    },
+    {
       title: 'AI Harassment Detector',
       description: 'Identifies & flags potential harassment patterns.',
       icon: Bot,
@@ -55,18 +67,8 @@ function Dashboard() {
       icon: UserX,
       path: '/anonymous',
     },
-    {
-      title: 'Silent SOS',
-      description: 'Discreet alerts for immediate assistance in a crisis.',
-      icon: AlertTriangle,
-      path: '/sos',
-    },
-    {
-      title: 'Scan & Detect',
-      description: 'Identify unauthorized use of your images & videos.',
-      icon: Search,
-      path: '/detect',
-    },
+    
+    
     
   ];
 
