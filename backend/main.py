@@ -6,7 +6,7 @@ from google.cloud import vision
 import os
 
 # Set your service account key file
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "vantaai-50fae3d7726c.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "vantaai-5adcbf498def.json"
 
 app = FastAPI()
 

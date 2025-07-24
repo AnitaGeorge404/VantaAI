@@ -37,3 +37,4 @@ __pycache__/
 # Local dev environment
 .env.localbackend/*.json
 backend/vantaai-50fae3d7726c.json
+backend/vantaai-5adcbf498def.json
