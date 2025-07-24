@@ -284,73 +284,84 @@ const SilentSOS = () => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.header}>
-        <h2>WeatherNow</h2>
-        <div>{weather.location}</div>
-      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "20px",
+        }}
+      >
+        <div style={styles.header}>
+          <h2>WeatherNow</h2>
+          <div>{weather.location}</div>
+        </div>
 
-      <div style={styles.main}>
-        <div style={styles.temperature}>
-          <span
-            onClick={handleTempClick}
-            style={styles.tempText}
-            title="Click 5 times to download evidence"
-          >
-            {weather.temperature}°
-          </span>
-          <span
-            onClick={handleCloudClick}
-            style={styles.icon}
-            title="Click 3 times for SOS"
-          >
-            {getIcon(weather.condition)}
-          </span>
-        </div>
-        <div>{weather.condition}</div>
-        <div>
-          Humidity: {weather.humidity}% | Wind: {weather.windSpeed} mph
-        </div>
-        <h4 style={styles.forecastHeader}>Forecast</h4>
-        {weather.forecast.map((f, i) => (
-          <div key={i} style={styles.forecastItem}>
-            <span>{f.day}:</span>
-            <span>
-              {getIcon(f.condition)} {f.high}° / {f.low}°
+        <div style={styles.main}>
+          <div style={styles.temperature}>
+            <span
+              onClick={handleTempClick}
+              style={styles.tempText}
+              title="Click 5 times to download evidence"
+            >
+              {weather.temperature}°
+            </span>
+            <span
+              onClick={handleCloudClick}
+              style={styles.icon}
+              title="Click 3 times for SOS"
+            >
+              {getIcon(weather.condition)}
             </span>
           </div>
-        ))}
-        {/* Optional: Display download buttons if links exist */}
-        {(evidenceLinks.video ||
-          evidenceLinks.audio ||
-          evidenceLinks.screen) && (
-          <div style={styles.downloadSection}>
-            <p>Evidence is ready for download:</p>
-            {evidenceLinks.video && (
-              <button
-                onClick={() => downloadEvidence("video", evidenceLinks.video)}
-                style={styles.button}
-              >
-                Download Video Evidence
-              </button>
-            )}
-            {evidenceLinks.audio && (
-              <button
-                onClick={() => downloadEvidence("audio", evidenceLinks.audio)}
-                style={{ ...styles.button, marginLeft: 10 }}
-              >
-                Download Audio Evidence
-              </button>
-            )}
-            {evidenceLinks.screen && (
-              <button
-                onClick={() => downloadEvidence("screen", evidenceLinks.screen)}
-                style={{ ...styles.button, marginLeft: 10 }}
-              >
-                Download Screen Recording
-              </button>
-            )}
+          <div>{weather.condition}</div>
+          <div>
+            Humidity: {weather.humidity}% | Wind: {weather.windSpeed} mph
           </div>
-        )}
+          <h4 style={styles.forecastHeader}>Forecast</h4>
+          {weather.forecast.map((f, i) => (
+            <div key={i} style={styles.forecastItem}>
+              <span>{f.day}:</span>
+              <span>
+                {getIcon(f.condition)} {f.high}° / {f.low}°
+              </span>
+            </div>
+          ))}
+          {/* Optional: Display download buttons if links exist */}
+          {(evidenceLinks.video ||
+            evidenceLinks.audio ||
+            evidenceLinks.screen) && (
+            <div style={styles.downloadSection}>
+              <p>Evidence is ready for download:</p>
+              {evidenceLinks.video && (
+                <button
+                  onClick={() => downloadEvidence("video", evidenceLinks.video)}
+                  style={styles.button}
+                >
+                  Download Video Evidence
+                </button>
+              )}
+              {evidenceLinks.audio && (
+                <button
+                  onClick={() => downloadEvidence("audio", evidenceLinks.audio)}
+                  style={{ ...styles.button, marginLeft: 10 }}
+                >
+                  Download Audio Evidence
+                </button>
+              )}
+              {evidenceLinks.screen && (
+                <button
+                  onClick={() =>
+                    downloadEvidence("screen", evidenceLinks.screen)
+                  }
+                  style={{ ...styles.button, marginLeft: 10 }}
+                >
+                  Download Screen Recording
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -358,24 +369,25 @@ const SilentSOS = () => {
 
 const styles = {
   container: {
-    maxWidth: 400,
     margin: "0 auto",
-    padding: 20,
     fontFamily: "Arial, sans-serif",
     background: "linear-gradient(to bottom, #74b9ff, #0984e3)",
     color: "white",
-    borderRadius: 15,
     boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
     minHeight: "calc(100vh - 40px)",
     display: "flex",
     flexDirection: "column",
+    position: "absolute",
+    top: 0,
+    width: " 100%",
+    height: "100vh",
   },
   header: { textAlign: "center", marginBottom: 20 },
   main: {
     background: "rgba(255,255,255,0.1)",
     borderRadius: 15,
     padding: 20,
-    flexGrow: 1,
+    width: "80%",
   },
   temperature: {
     fontSize: 48,
