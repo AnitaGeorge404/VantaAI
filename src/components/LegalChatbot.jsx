@@ -22,63 +22,120 @@ const LegalChatbot = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const generateLegalResponse = (userMessage) => {
-    const message = userMessage.toLowerCase();
-    
-    if (message.includes('fir') || message.includes('police complaint')) {
-      return {
-        text: "For filing an FIR (First Information Report), you need to visit the nearest police station with relevant documents. An FIR should contain: 1) Details of the incident, 2) Date, time and place, 3) Names of accused if known, 4) Evidence or witnesses. You can also use our FIR Generator tool for assistance. Remember, filing a false FIR is an offense under Section 182 of IPC.",
-        category: 'criminal_law'
-      };
-    }
-    
-    if (message.includes('dowry') || message.includes('498a')) {
-      return {
-        text: "Section 498A of IPC deals with cruelty to women by husband or relatives. Dowry harassment is a serious crime. Victims can file complaints under: 1) Section 498A IPC (cruelty), 2) Dowry Prohibition Act, 3) Section 304B IPC (dowry death). Support is available through women helplines (181) and legal aid. Evidence like medical records, witness statements are important.",
-        category: 'women_rights'
-      };
-    }
-    
-    if (message.includes('property') || message.includes('land') || message.includes('inheritance')) {
-      return {
-        text: "Property disputes in India are governed by various laws including Transfer of Property Act, Registration Act, and personal laws. Key points: 1) Ensure proper registration of property, 2) Check clear title, 3) For inheritance, succession laws apply, 4) Women have equal rights in ancestral property. Civil courts have jurisdiction over property matters.",
-        category: 'property_law'
-      };
-    }
-    
-    if (message.includes('divorce') || message.includes('marriage') || message.includes('maintenance')) {
-      return {
-        text: "Marriage and divorce laws vary by religion in India. Under Hindu Marriage Act: Divorce grounds include cruelty, desertion, adultery, conversion, mental disorder. For maintenance: Both wife and children entitled to support. Section 125 CrPC provides for maintenance. Mutual consent divorce is faster than contested divorce.",
-        category: 'family_law'
-      };
-    }
-    
-    if (message.includes('cybercrime') || message.includes('online fraud') || message.includes('it act')) {
-      return {
-        text: "Cybercrime falls under IT Act 2000 and IPC. Common offenses: 1) Section 66 IT Act (computer-related offenses), 2) Section 66C (identity theft), 3) Section 67 (obscene content), 4) Section 420 IPC (online fraud). Report to local cyber cell or cybercrime.gov.in. Preserve evidence like screenshots, transaction details.",
-        category: 'cyber_law'
-      };
-    }
-    
-    if (message.includes('bail') || message.includes('arrest') || message.includes('custody')) {
-      return {
-        text: "Bail is governed by CrPC Sections 436-450. Types: 1) Regular bail (before conviction), 2) Anticipatory bail (Section 438), 3) Interim bail. Bail is generally granted for bailable offenses. For non-bailable offenses, court discretion applies. Right to legal aid available. Contact nearest legal aid committee if unable to afford lawyer.",
-        category: 'criminal_procedure'
-      };
-    }
-    
-    if (message.includes('consumer') || message.includes('product defect') || message.includes('service complaint')) {
-      return {
-        text: "Consumer disputes are handled under Consumer Protection Act 2019. You can file complaints for: 1) Defective goods, 2) Deficient services, 3) Unfair trade practices, 4) Misleading advertisements. Forums: District Consumer Commission (up to ₹1 crore), State Commission (₹1 crore to ₹10 crore), National Commission (above ₹10 crore). Online filing available.",
-        category: 'consumer_law'
-      };
-    }
-    
+ const generateLegalResponse = (userMessage) => {
+  const message = userMessage.toLowerCase();
+
+  if (message.includes('fir') || message.includes('police complaint')) {
     return {
-      text: "I understand you have a legal query. While I can provide general information about Indian laws, I'd recommend consulting with a qualified lawyer for specific legal advice. You can also try rephrasing your question with more specific legal terms, or use our FIR generator if you need to file a complaint.",
-      category: 'general'
+      text: "Filing an FIR is governed by the Criminal Procedure Code (CrPC). Visit the nearest police station with details of the incident, names of accused if known, and evidence. An FIR must contain: incident details, date/time/location, witnesses. False FIRs are penalized under Section 182 IPC. After filing, get an acknowledgment and track the progress at the police station.",
+      category: 'criminal_law'
     };
+  }
+
+  if (message.includes('dowry') || message.includes('498a')) {
+    return {
+      text: "Dowry harassment and cruelty fall under Section 498A IPC, Dowry Prohibition Act, and Section 304B IPC (dowry death). Victims should file complaints at police or women’s help centers (181). Collect evidence like medical reports and witness statements. Police will register FIR and investigate under IPC and relevant laws.",
+      category: 'women_rights'
+    };
+  }
+
+  if (message.includes('property') || message.includes('land') || message.includes('inheritance')) {
+    return {
+      text: "Property disputes are governed by Transfer of Property Act, Registration Act, and personal laws. For inheritance, succession laws apply. Women have equal rights in ancestral property under Hindu Succession Act. File civil suit in district or family courts with documents proving ownership or inheritance claims.",
+      category: 'property_law'
+    };
+  }
+
+  if (message.includes('divorce') || message.includes('marriage') || message.includes('maintenance')) {
+    return {
+      text: "Marriage and divorce laws vary by religion (Hindu Marriage Act, Special Marriage Act, etc.). Grounds for divorce include cruelty, desertion, adultery. Maintenance is covered under Section 125 CrPC. Victims can file petitions in family courts. Mutual consent divorce is faster; legal counsel is advised.",
+      category: 'family_law'
+    };
+  }
+
+  if (message.includes('deepfake')) {
+    return {
+      text: "Deepfakes relate to multiple offenses: identity theft (Sections 66C & 66D IT Act), privacy violation (Section 66E IT Act), transmitting obscene material (Sections 67, 67A, 67B IT Act), defamation (Sections 499 & 500 IPC), and forgery (Section 463 IPC). Victims should preserve evidence (videos, screenshots), file complaints at cyber cells or via the National Cyber Crime Reporting Portal (cybercrime.gov.in), and inform authorities promptly for investigation and content removal.",
+      category: 'deepfake'
+    };
+  }
+
+  if (message.includes('cybercrime') || message.includes('online fraud') || message.includes('it act')) {
+    return {
+      text: "Cybercrime is addressed under IT Act 2000 (Sections 43, 66, 66C, 66D, 66E, 67, 67A) and Indian Penal Code (e.g., Section 420 for online fraud). Common offenses include hacking, identity theft, transmitting obscene content, fraud. Victims should preserve all evidence (screenshots, transaction details), file complaints at the nearest cyber cell or via National Cyber Crime Reporting Portal (cybercrime.gov.in), and track complaint status online.",
+      category: 'cyber_law'
+    };
+  }
+
+  if (message.includes('identity theft') || message.includes('password hacking') || message.includes('digital signature')) {
+    return {
+      text: "Identity theft and cheating by impersonation fall under Sections 66C and 66D of the IT Act, punishable by imprisonment up to 3 years and fines. Victims should immediately report to local cybercrime authorities or file complaints online, change passwords, freeze financial accounts if necessary, preserve evidence like screenshots and communication logs, and inform contacts to avoid misuse.",
+      category: 'identity_theft'
+    };
+  }
+
+  if (message.includes('obscene content') || message.includes('pornography') || message.includes('section 67')) {
+    return {
+      text: "Publishing or transmitting obscene material is punishable under Section 67 of the IT Act, with imprisonment up to 5 years and fines up to ₹10 lakh. Child pornography falls under Section 67B with stricter penalties. Victims should file complaints at cybercrime cells or via online portals, provide URLs, screenshots, or videos as evidence, and cooperate with investigations.",
+      category: 'obscenity'
+    };
+  }
+
+  if (message.includes('cyber terrorism') || message.includes('section 66f')) {
+    return {
+      text: "Cyber terrorism (Section 66F IT Act) involves threatening India’s sovereignty or security using computers, punishable with life imprisonment. Victims or witnesses must immediately report to police or cyber cells. Collect evidence carefully and cooperate with authorities for swift prosecution.",
+      category: 'cyber_terrorism'
+    };
+  }
+
+  if (message.includes('hacking') || message.includes('unauthorized access') || message.includes('section 66')) {
+    return {
+      text: "Hacking and unauthorized access fall under Section 66 IT Act, punishable by imprisonment up to 3 years and fines. Victims should file formal complaints at cybercrime cells or online portals, secure their devices, document incidents with logs and screenshots, and cooperate with investigating officers.",
+      category: 'hacking'
+    };
+  }
+
+  if (message.includes('defamation') || message.includes('social media defamation')) {
+    return {
+      text: "Online defamation is covered under IPC Sections 499 and 500 and IT Act provisions. Victims should collect evidence such as screenshots and URLs, file complaints at police stations or cyber cells, and may seek legal remedies including injunctions or damages through courts.",
+      category: 'defamation'
+    };
+  }
+
+  if (message.includes('phishing') || message.includes('section 66c')) {
+    return {
+      text: "Phishing is covered under Section 66C IT Act. Victims should report immediately to cybercrime authorities, freeze compromised accounts, change passwords, preserve phishing emails/messages as evidence, and file complaints online or at cyber cells.",
+      category: 'phishing'
+    };
+  }
+
+  if (message.includes('privacy violation') || message.includes('section 66e')) {
+    return {
+      text: "Violation of privacy, including unauthorized capture or sharing of images/videos, falls under Section 66E IT Act. Victims should file complaints with cybercrime cells or courts, preserve evidence, and can seek protection orders or restraining orders as applicable.",
+      category: 'privacy'
+    };
+  }
+
+  if (message.includes('spam') || message.includes('scam')) {
+    return {
+      text: "Spam and scam detection is vital. Victims should report suspicious messages or emails to local cyber cells, avoid clicking unknown links, preserve evidence like screenshots or message details, and file complaints online if scammed.",
+      category: 'spam_scam'
+    };
+  }
+
+  if (message.includes('consumer') || message.includes('product defect') || message.includes('service complaint')) {
+    return {
+      text: "Consumer disputes are governed by Consumer Protection Act 2019. Complaints can be filed for defective goods, deficient services, unfair trade practices, or misleading advertisements at District, State, or National Consumer Commissions depending on value. Online complaint filing is available.",
+      category: 'consumer_law'
+    };
+  }
+
+  return {
+    text: "I understand you have a legal query. While I provide general information about Indian laws, consulting a qualified lawyer is recommended for specific advice. Try using more specific legal terms or use our FIR generator for complaint assistance.",
+    category: 'general'
   };
+};
+
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
