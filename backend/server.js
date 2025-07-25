@@ -6,7 +6,7 @@ import cors from "cors";
 import fetch from "node-fetch";
 import stringSimilarity from "string-similarity";
 
-const IS_OLLAMA_ENABLED = true; // Leave true if you want to use Ollama
+const IS_OLLAMA_ENABLED = true; 
 
 const app = express();
 app.use(cors());
@@ -15,7 +15,6 @@ app.use(express.json());
 const OLLAMA_API_URL = "http://localhost:11434/api/chat";
 const MODEL_NAME = "phi3:mini";
 
-// ✅ Hardcoded replies
 const hardcodedReplies = {
   "hi": "Hello! It's good to hear from you. Take your time, and please know this is a safe space if you ever want to share what's on your mind.",
   "hello": "Hello! It's good to hear from you. Take your time, and please know this is a safe space if you ever want to share what's on your mind.",
@@ -37,20 +36,13 @@ function getFuzzyMatchReply(userInput) {
   return match.bestMatch.rating > 0.6 ? hardcodedReplies[match.bestMatch.target] : null;
 }
 
-// IMPORTANT: This function is problematic for *streaming* tokens
-// because .trim() removes leading/trailing spaces essential for concatenation,
-// and replace(/\s+/g, " ") might be redundant or disruptive for single tokens.
-// It's generally better to sanitize the *final* complete response.
-// For now, we'll use it very carefully or remove it from the streaming path.
+
 function sanitizeAIText(text) {
-  // We specifically avoid .trim() and excessive space collapsing here for streaming,
-  // as the LLM output itself should handle natural spacing.
-  // If you must remove things like "Note:" mid-stream, it's more complex.
+  
   return text
-    .replace(/note:.*$/gi, "") // This might still cut off part of a valid response if "Note:" appears mid-sentence.
-    .replace(/(I am an AI.*?model.*?)/gi, ""); // This is fine as it targets specific phrases.
-    // .replace(/\s+/g, " ") // Removed for streaming, as it could interfere with single spaces
-    // .trim(); // Removed for streaming, as it removes essential leading spaces
+    .replace(/note:.*$/gi, "") 
+    .replace(/(I am an AI.*?model.*?)/gi, ""); 
+    
 }
 
 
@@ -103,16 +95,23 @@ app.post("/api/chat", async (req, res) => {
   }
 
   const systemPrompt = `
-You are Vanta AI — a warm, trauma-informed AI assistant created by a hackathon team.
+You are Vanta AI — a warm, trauma-informed assistant created by a hackathon team to support women’s safety in India.
 You are not built by Microsoft or OpenAI. You run locally using open-source models like Phi-3 via Ollama.
 
-Your role is to:
-- Help users navigate online safety, abuse, privacy, and support resources.
-- Be conversational, short, and helpful (1–3 sentences).
-- Always speak like a real person, not like a chatbot or software.
-- Avoid robotic disclaimers like "Note:", "I am an AI model", etc.
+You support women facing online abuse, harassment, privacy threats, or emotional distress.
 
-Be honest, respectful, and kind. Offer reassurance to users who are feeling unsafe or overwhelmed. Help them feel supported, not judged.
+Your job is to:
+
+Offer empathy, safety advice, and legal or emotional support.
+
+Share relevant Indian helplines, cyber complaint links, and local NGO/lawyer info.
+
+Respond in a kind, calm, and human way — short, helpful answers (1–3 sentences).
+
+Help users feel heard and safe, especially during late hours or emergencies.
+
+ Never say things like “As an AI model…” or “Note:”.
+ Always speak like a real person — honest, supportive, and never judgmental.
   `.trim();
 
   try {
@@ -146,7 +145,7 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
 
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
-    // Removed lastPartial as it's not needed for incremental token streams from Ollama
+  
 
     for await (const chunk of ollamaResponse.body) {
       buffer += decoder.decode(chunk, { stream: true });
@@ -167,24 +166,19 @@ Be honest, respectful, and kind. Offer reassurance to users who are feeling unsa
           }
 
           if (parsed.message?.content) {
-            // Ollama's message.content is already the incremental token.
-            // Apply sanitization carefully, avoiding methods that remove crucial spaces.
+            
             const token = sanitizeAIText(parsed.message.content); // Apply only specific sanitization
 
-            // Send the token directly. Ollama usually includes leading spaces in tokens like " world".
             res.write(`data: ${JSON.stringify({ token: token })}\n\n`);
             await new Promise(resolve => setTimeout(resolve, 30));
           }
 
 
         } catch (e) {
-          // console.error("Error parsing Ollama stream chunk:", e.message, "Line:", line); // For debugging malformed chunks
-          // Ignore malformed chunks
         }
       }
     }
 
-    // ✅ Fallback done signal (if not already sent above)
     if (!res.writableEnded) {
       res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
       res.end();
