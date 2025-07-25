@@ -39,6 +39,51 @@ const mentalSupportData = [
     availability: "Play Store / App Store",
     link: "https://www.wysa.io/",
   },
+  // --- New Relaxation Techniques Below ---
+  {
+    type: "Relaxation Technique",
+    name: "Deep Breathing (4-7-8 method)",
+    description: "A simple breathing technique to calm your nervous system. Inhale for 4 counts, hold for 7, exhale for 8.",
+    contact: null,
+    availability: "Anytime, Anywhere",
+    link: "https://www.drweil.com/videos-features/videos/breathing-video/", // Example link to a common resource
+  },
+  {
+    type: "Relaxation Technique",
+    name: "Progressive Muscle Relaxation",
+    description: "Tense and then relax different muscle groups in your body to release physical tension.",
+    contact: null,
+    availability: "Anytime",
+    link: null, // No specific external link for this example
+  },
+  {
+    type: "Relaxation Technique",
+    name: "Mindful Grounding (5-4-3-2-1)",
+    description: "Engage your senses to anchor yourself in the present moment: Notice 5 things you can see, 4 things you can feel, 3 things you can hear, 2 things you can smell, and 1 thing you can taste.",
+    contact: null,
+    availability: "Anytime, Anywhere",
+    link: null,
+  },
+  {
+    type: "Relaxation Technique",
+    name: "Guided Visualization",
+    description: "Imagine a peaceful place or scenario in detail to promote relaxation and calm.",
+    contact: null,
+    availability: "Requires quiet space",
+    link: null,
+  },
+  {
+    type: "Relaxation Technique",
+    name: "Immediate Grounding Techniques", // New entry for your specific example
+    description: [
+      "Slowly drink a glass of water and focus on the present.",
+      "Tidy one physical space (desk, bed, or shelf).",
+      "Select one item from that space and note its memory or meaning.",
+    ],
+    contact: null,
+    availability: "Anytime, Anywhere",
+    link: null,
+  },
 ];
 
 export default mentalSupportData;
