@@ -56,25 +56,46 @@ const DeepfakeDetector = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200 dark:bg-gradient-to-b dark:from-blue-200 dark:via-purple-200 dark:to-pink-200 flex items-center justify-center">
-      <div style={{
-        fontFamily: "sans-serif",
-        maxWidth: "500px",
-        margin: "auto",
-        backgroundColor:"white",
-        padding: "2rem",
-        borderRadius: "1rem",
-        minHeight: "100vh"
-      }}>
+      <div
+        style={{
+          fontFamily: "sans-serif",
+          maxWidth: "500px",
+          margin: "auto",
+          backgroundImage: "linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)",
+          padding: "2rem",
+          borderRadius: "1rem",
+          minHeight: "100vh",
+        }}
+      >
         <div style={{ marginBottom: "1.5rem" }}>
-          <h1 style={{ fontSize: "1.5rem", color: "#6B21A8", marginBottom: "0.25rem" }}>Deepfake Detector</h1>
+          <h1
+            style={{
+              fontSize: "1.5rem",
+              color: "#6B21A8",
+              marginBottom: "0.25rem",
+            }}
+          >
+            Deepfake Detector
+          </h1>
           <p style={{ fontSize: "0.875rem", color: "#4B5563" }}>
-            Upload an image to classify whether it's real or fake using a deepfake detection model.
+            Upload an image to classify whether it's real or fake using a
+            deepfake detection model.
           </p>
         </div>
 
-        <ImageUpload onImageUpload={handleImageUpload} imagePreview={imagePreview} />
+        <ImageUpload
+          onImageUpload={handleImageUpload}
+          imagePreview={imagePreview}
+        />
 
-        <div style={{ display: "flex", gap: "1rem", marginTop: "1rem", justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            marginTop: "1rem",
+            justifyContent: "center",
+          }}
+        >
           <button
             onClick={clearImage}
             disabled={!uploadedImage}
@@ -85,7 +106,7 @@ const DeepfakeDetector = () => {
               color: "#991B1B",
               border: "none",
               cursor: "pointer",
-              fontWeight: "500"
+              fontWeight: "500",
             }}
           >
             Clear
@@ -100,7 +121,7 @@ const DeepfakeDetector = () => {
               color: "#1D4ED8",
               border: "none",
               cursor: "pointer",
-              fontWeight: "500"
+              fontWeight: "500",
             }}
           >
             {isAnalyzing ? "Analyzing..." : "Analyze Image"}
@@ -121,7 +142,7 @@ const DeepfakeDetector = () => {
                 fontWeight: "500",
                 border: "none",
                 boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               🚩 Flag for Review

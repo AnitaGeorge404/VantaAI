@@ -9,7 +9,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Use specific domain in production
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,7 +24,6 @@ async def web_detect(file: UploadFile = File(...)):
     response = client.web_detection(image=image)
     annotations = response.web_detection
 
-    # Handle None fields safely
     full_matches = annotations.pages_with_matching_images if annotations.pages_with_matching_images else []
     partial_matches = annotations.partial_matching_images if annotations.partial_matching_images else []
     similar_images = annotations.visually_similar_images if annotations.visually_similar_images else []
