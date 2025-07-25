@@ -37,8 +37,7 @@ function TakedownRequests() {
           Upload a file or paste a link that you want to report. We'll guide
           you through sending a takedown request to the platform.
         </p>
-
-        {/* Mode Switcher */}
+ 
         <div style={{ marginBottom: "20px" }}>
           <button
             style={{
@@ -79,7 +78,7 @@ function TakedownRequests() {
           </button>
         </div>
 
-        {/* Input Area */}
+        
         {mode === "file" ? (
           <input
             type="file"
@@ -123,7 +122,6 @@ function TakedownRequests() {
           Submit
         </button>
 
-        {/* Instructions after Proceed */}
         {proceed && (
           <div
             style={{

@@ -9,12 +9,12 @@ function TakedownForm() {
 
   const handleAnalyze = () => {
     if (!input) return;
-    setShowPopup(true); // Always show popup
+    setShowPopup(true); 
   };
 
   const handleProceed = () => {
     setShowPopup(false);
-    setProceed(true); // Show takedown form
+    setProceed(true); 
   };
 
   return (

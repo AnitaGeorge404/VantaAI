@@ -73,8 +73,6 @@ const InputBar = ({ input, setInput, handleSend, isSending }) => {
 };
 
 
-// --- Main Component ---
-
 function EmotionalSupport() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -125,7 +123,6 @@ function EmotionalSupport() {
     let botMessageIndex = -1;
     let accumulatedResponse = "";
 
-    // Create placeholder assistant message
     setMessages(prev => {
       const newMessages = [...prev, { role: "assistant", content: "" }];
       botMessageIndex = newMessages.length - 1;

@@ -39,14 +39,14 @@ const mentalSupportData = [
     availability: "Play Store / App Store",
     link: "https://www.wysa.io/",
   },
-  // --- New Relaxation Techniques Below ---
+
   {
     type: "Relaxation Technique",
     name: "Deep Breathing (4-7-8 method)",
     description: "A simple breathing technique to calm your nervous system. Inhale for 4 counts, hold for 7, exhale for 8.",
     contact: null,
     availability: "Anytime, Anywhere",
-    link: "https://www.drweil.com/videos-features/videos/breathing-video/", // Example link to a common resource
+    link: "https://www.drweil.com/videos-features/videos/breathing-video/", 
   },
   {
     type: "Relaxation Technique",
@@ -54,7 +54,7 @@ const mentalSupportData = [
     description: "Tense and then relax different muscle groups in your body to release physical tension.",
     contact: null,
     availability: "Anytime",
-    link: null, // No specific external link for this example
+    link: null, 
   },
   {
     type: "Relaxation Technique",
@@ -74,7 +74,7 @@ const mentalSupportData = [
   },
   {
     type: "Relaxation Technique",
-    name: "Immediate Grounding Techniques", // New entry for your specific example
+    name: "Immediate Grounding Techniques", 
     description: [
       "Slowly drink a glass of water and focus on the present.",
       "Tidy one physical space (desk, bed, or shelf).",

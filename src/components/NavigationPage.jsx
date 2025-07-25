@@ -5,7 +5,7 @@ function Navigation() {
     <div
       style={{
         height: "100vh",
-        width: "100vw", // Fixed typo: "100wh" → "100vw"
+        width: "100vw", 
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",

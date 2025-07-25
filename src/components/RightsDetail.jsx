@@ -63,7 +63,7 @@ function RightsDetail() {
                   }}
                 >
                   {" "}
-                  {/* Increased max-height for longer content */}
+                  
                   <div style={styles.accordionContent}>
                     {category.laws.map((law, lawIdx) => (
                       <div key={lawIdx} style={styles.lawItem}>
@@ -97,7 +97,6 @@ const styles = {
   container: {
     height: "100vh",
     overflowY: "auto",
-    // Reverted to the original background as requested
     background: "linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)",
     fontFamily: "'Inter', sans-serif",
     padding: "32px 16px",

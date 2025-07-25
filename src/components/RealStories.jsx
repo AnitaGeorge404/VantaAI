@@ -22,7 +22,7 @@ function RealStories() {
   return (
     <div style={styles.container}>
       <div style={styles.contentWrapper}>
-        {/* Header Section */}
+        
         <div style={styles.header}>
           <h1 style={styles.mainTitle}>Real Stories</h1>
           <button onClick={() => navigate(-1)} style={styles.backButton}>
@@ -30,13 +30,13 @@ function RealStories() {
           </button>
         </div>
 
-        {/* Intro */}
+        
         <p style={styles.introText}>
           These real stories reflect the courage of individuals who stood up
           against abuse and harassment. Their experiences empower and inspire.
         </p>
 
-        {/* Grouped stories in a simple, scrollable list */}
+        
         <div style={styles.sectionsContainer}>
           {Object.entries(groupedStories).map(([tag, stories]) => (
             <section key={tag} style={styles.tagSection}>
@@ -67,7 +67,7 @@ function RealStories() {
   );
 }
 
-// Styles focused on a clean, spacious, non-interactive list
+
 const styles = {
   container: {
     background: "linear-gradient(180deg, #E0EFFF 0%, #EAE4FF 100%)",
@@ -115,10 +115,10 @@ const styles = {
   sectionsContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: "3rem", // Increased space between tag sections
+    gap: "3rem", 
   },
   tagSection: {
-    // Each section for a tag
+    
   },
   tagTitle: {
     fontSize: "clamp(20px, 3vw, 24px)",
@@ -130,8 +130,8 @@ const styles = {
   },
   storyList: {
     display: "grid",
-    gridTemplateColumns: "1fr", // Ensures one card per row
-    gap: "20px", // Space between cards in a section
+    gridTemplateColumns: "1fr", 
+    gap: "20px", 
   },
   storyCard: {
     background: "rgba(255, 255, 255, 0.7)",
