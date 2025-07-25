@@ -141,16 +141,9 @@ function MentalHealth() {
 
   return (
     <div style={inlineStyles.pageWrapper}>
-      {/* Back button */}
-      <div style={inlineStyles.backButtonContainer}>
-        <Link to="/support" style={inlineStyles.backButton}>
-          <ArrowLeft size={16} style={{ marginRight: '8px' }} />
-          Back to Support
-        </Link>
-      </div>
 
       <h2 style={inlineStyles.heading}>
-        🤝 Community Support
+        Community Support
       </h2>
 
       <div style={inlineStyles.grid}>
@@ -219,7 +212,7 @@ function MentalHealth() {
       </div>
 
       <h2 style={inlineStyles.heading}>
-        🧠 Mental Health Resources
+        Mental Health Resources
       </h2>
 
       <div style={inlineStyles.grid}>
